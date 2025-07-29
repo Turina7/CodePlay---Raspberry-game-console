@@ -1,4 +1,4 @@
-# LabProc
+# CodePlay
 
 Este repositório apresenta o trabalho desenvolvido para a disciplina **PCS3732 - Laboratório de Processadores**.
 
@@ -15,6 +15,20 @@ O projeto tem como objetivo aplicar conceitos estudados em aula, além de explor
 Trabalharemos com a placa **Raspberry Pi**, utilizando-a como uma **central de processamento de jogos**. Importante destacar que **não** pretendemos desenvolver um emulador. Em vez disso, os jogos serão implementados diretamente na placa, sem o uso de imagens ou ROMs pré-existentes.
 
 Dado o escopo ambicioso do projeto, estabelecemos marcos de **provas de conceito** que podem ser entregues caso o desenvolvimento completo não seja possível dentro do prazo.
+
+## Organização do Projeto
+
+A estrutura do projeto foi planejada para garantir modularidade e facilitar a expansão futura. A seguir, descrevemos os principais componentes que compõem o sistema:
+
+- **Biblioteca de Jogos**: pasta dedicada aos jogos disponíveis. O usuário poderá adicionar novos jogos seguindo um conjunto de diretrizes predefinidas, permitindo que eles sejam integrados ao console.
+
+- **Módulo de Vídeo**: responsável pela geração e controle da saída de vídeo via HDMI, sem depender de computadores auxiliares.
+
+- **Módulo de Entrada**: encarregado de capturar e processar as entradas do teclado USB conectado à Raspberry Pi.
+
+- **Módulo Central**: atua como núcleo do sistema, gerenciando a lógica do console, a seleção de jogos e a execução dos módulos periféricos.
+
+- **Arquivo Makefile**: automatiza a construção do sistema, gerando um `kernel.img` que será copiado para o cartão SD. Esse cartão será utilizado para inicializar a Raspberry Pi diretamente no ambiente do console.
 
 ## Entrada dos Controles
 
