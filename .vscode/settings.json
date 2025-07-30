@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "random": "c",
-        "cstdlib": "c",
-        "cstdint": "c"
-    }
-}
