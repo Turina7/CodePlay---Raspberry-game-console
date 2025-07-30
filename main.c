@@ -27,7 +27,7 @@ void main() {
     //uint32_t gray_color     = 0xFF808080; // Alpha=255, Red=128, Green=128, Blue=128
     //uint32_t purple_color   = 0xFF800080; // Alpha=255, Red=128, Green=0,   Blue=128
     
-    uint32_t test_matrix[16][16] = {
+    uint32_t brasil_matrix[16][16] = {
     {0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00},
     {0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00},
     {0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFF0000FF, 0xFF0000FF, 0xFFFFFF00, 0xFFFFFF00, 0xFFFFFF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00},
@@ -46,8 +46,12 @@ void main() {
     {0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00},
     };
 
-    fill_screen_from_matrix((uint32_t*)test_matrix, 16, 16);
     while(1){
-        //for (volatile int i = 0; i < 10000000; i++);
+        fill_screen_from_matrix((uint32_t*)brasil_matrix, 16, 16);
+        for (volatile int i = 0; i < 10000000; i++);
+        paint_blue_screen();
+        for (volatile int i = 0; i < 10000000; i++);
+        paint_orange_screen();
+        for (volatile int i = 0; i < 10000000; i++);
     }
 }
