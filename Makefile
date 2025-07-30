@@ -12,7 +12,7 @@ CFLAGS = -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -nostdlib -nostartfil
 ASFLAGS = -mcpu=cortex-a7
 
 # Arquivos fonte
-SOURCES_C = main.c video.c
+SOURCES_C = main.c video.c utils.c
 SOURCES_S = boot.s
 
 # Arquivos objeto
