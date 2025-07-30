@@ -1,6 +1,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 #include <stdint.h>
+#include "utils.h"
 
 int init_framebuffer();
 void paint_blue_screen();
