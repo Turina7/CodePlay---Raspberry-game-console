@@ -236,29 +236,6 @@ void paint_orange_screen() {
     debug_blink(4);
 }
 
-// Assembly inline NEON para copy ultra-rápido
-static inline void neon_memcpy_128(void* dst, const void* src, uint32_t bytes) {
-    // bytes deve ser múltiplo de 128
-    uint32_t chunks = bytes / 128;
-    
-    __asm__ volatile (
-        "1:                          \n"
-        "vld1.64    {q0, q1}, [%1]!  \n"  // Load 32 bytes (128 bits x 2)
-        "vld1.64    {q2, q3}, [%1]!  \n"  // Load mais 32 bytes
-        "vld1.64    {q4, q5}, [%1]!  \n"  // Load mais 32 bytes  
-        "vld1.64    {q6, q7}, [%1]!  \n"  // Load mais 32 bytes = 128 bytes total
-        "vst1.64    {q0, q1}, [%0]!  \n"  // Store 32 bytes
-        "vst1.64    {q2, q3}, [%0]!  \n"  // Store mais 32 bytes
-        "vst1.64    {q4, q5}, [%0]!  \n"  // Store mais 32 bytes
-        "vst1.64    {q6, q7}, [%0]!  \n"  // Store mais 32 bytes = 128 bytes total
-        "subs       %2, %2, #1       \n"  // Decrementa contador
-        "bne        1b               \n"  // Loop se não zero
-        : "+r" (dst), "+r" (src), "+r" (chunks)
-        :
-        : "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7"
-    );
-}
-
 // Função para copiar back buffer para front buffer (swap buffers)
 void swap_buffers() {
     if (fb_msg.fb_addr == 0) {
@@ -271,23 +248,9 @@ void swap_buffers() {
     
     // Copiar todo o back buffer para o front buffer
     uint32_t total_pixels = (fb_msg.pitch / 4) * fb_msg.virt_height;
-    uint32_t total_bytes = total_pixels * 4;
     
-    // Usar NEON para chunks de 128 bytes (32 pixels)
-    uint32_t neon_bytes = (total_bytes / 128) * 128;
-    if (neon_bytes > 0) {
-        neon_memcpy_128(framebuffer, back_buffer, neon_bytes);
-    }
-    
-    // Copiar bytes restantes (se houver)
-    uint32_t remaining_bytes = total_bytes - neon_bytes;
-    if (remaining_bytes > 0) {
-        uint8_t* dst_remaining = (uint8_t*)framebuffer + neon_bytes;
-        uint8_t* src_remaining = (uint8_t*)back_buffer + neon_bytes;
-        for (uint32_t i = 0; i < remaining_bytes; i++) {
-            dst_remaining[i] = src_remaining[i];
-        }
-    }
+    // Usar memcpy otimizado (implementado em utils.c)
+    memcpy(framebuffer, back_buffer, total_pixels * sizeof(uint32_t));
 }
 
 //Função de preenchimento de tela baseada em matriz qualquer
