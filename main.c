@@ -1,24 +1,21 @@
 #include "video.h"
 #include "utils.h"
 
-// --- Configurações da Animação ---
+// Usaremos uma matriz 16x16, igual à da bandeira que funcionava.
+#define MATRIX_DIM 16
 
-// Dimensões da matriz lógica que representa a tela
-#define SCREEN_WIDTH 32
-#define SCREEN_HEIGHT 24
+// Cores
+#define BLACK 0xFF000000
+#define WHITE 0xFFFFFFFF
 
-// Cores (formato ARGB)
-#define BG_COLOR    0xFF000000 // Preto
-#define BLOCK_COLOR 0xFF00FFFF // Ciano
-
-// Matriz lógica para o desenho
-uint32_t screen_matrix[SCREEN_HEIGHT][SCREEN_WIDTH];
+// A matriz que será desenhada na tela.
+uint32_t matrix[MATRIX_DIM][MATRIX_DIM];
 
 /*
  * Console Baremetal - Raspberry Pi 2
  * 
- * Animação simples de um bloco para testar o framebuffer
- * com atualizações recorrentes e de forma mais segura.
+ * Animação mais simples possível: um pixel se movendo
+ * em uma matriz 16x16 para validar o framebuffer.
  */
 void main() {
     // Delay para estabilizar o sistema
@@ -27,45 +24,42 @@ void main() {
     // Inicialização do display gráfico
     init_framebuffer();
 
-    // Posição inicial do bloco
-    int x = 0;
-    int y = 0;
-
-    // Direção inicial do movimento
-    int dx = 1;
-    int dy = 1;
+    // Posição e direção do pixel
+    int x = 0, y = 0;
+    int dx = 1, dy = 1;
 
     // Loop principal
     while(1) {
-        // 1. Limpar a matriz com a cor de fundo
-        for (int r = 0; r < SCREEN_HEIGHT; r++) {
-            for (int c = 0; c < SCREEN_WIDTH; c++) {
-                screen_matrix[r][c] = BG_COLOR;
+        // 1. Limpa a matriz com a cor preta
+        for (int r = 0; r < MATRIX_DIM; r++) {
+            for (int c = 0; c < MATRIX_DIM; c++) {
+                matrix[r][c] = BLACK;
             }
         }
 
-        // 2. Desenhar o bloco na sua posição atual
-        screen_matrix[y][x] = BLOCK_COLOR;
+        // 2. Desenha o pixel branco na posição atual
+        matrix[y][x] = WHITE;
 
-        // 3. Atualizar a posição do bloco para o próximo quadro
+        // 3. Atualiza a posição para o próximo quadro
         x += dx;
         y += dy;
 
-        // 4. Fazer o bloco quicar nas bordas da tela
-        if (x <= 0 || x >= SCREEN_WIDTH - 1) {
-            dx = -dx; // Inverte a direção horizontal
+        // 4. Lógica de "quicar" nas bordas da matriz 16x16
+        if (x <= 0 || x >= MATRIX_DIM - 1) {
+            dx = -dx;
         }
-        if (y <= 0 || y >= SCREEN_HEIGHT - 1) {
-            dy = -dy; // Inverte a direção vertical
+        if (y <= 0 || y >= MATRIX_DIM - 1) {
+            dy = -dy;
         }
 
-        // 5. Renderizar a matriz no back buffer (com scaling)
-        fill_screen_from_matrix((uint32_t*)screen_matrix, SCREEN_WIDTH, SCREEN_HEIGHT);
+        // 5. Renderiza a matriz no back buffer (usando a função que já funcionava)
+        fill_screen_from_matrix((uint32_t*)matrix, MATRIX_DIM, MATRIX_DIM);
         
-        // 6. Copiar o back buffer para o front buffer (exibir na tela)
+        // 6. Copia para o front buffer (exibe na tela)
         swap_buffers();
         
-        // 7. Delay para controlar a velocidade da animação
+        // 7. Delay para a animação ser visível
         for (volatile int i = 0; i < 500000; i++);
     }
 }
+
