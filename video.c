@@ -100,6 +100,10 @@ static struct mbox_fb_msg fb_msg __attribute__((aligned(16))) = {
     .end_tag = 0
 };
 
+// Back buffer para double buffering (alocação estática)
+// 1024x768x4 bytes = 3,145,728 bytes (~3MB)
+static uint32_t back_buffer[1024 * 768] __attribute__((aligned(16)));
+
 // Função para escrever no mailbox com timeout
 int mailbox_write(uint32_t channel, uint32_t data) {
     uint32_t timeout = 1000000;
@@ -165,6 +169,14 @@ int init_framebuffer() {
         return 0;
     }
     
+    // Back buffer já está alocado estaticamente
+    // Verificar se as dimensões coincidem
+    uint32_t expected_pixels = (fb_msg.pitch / 4) * fb_msg.virt_height;
+    if (expected_pixels > (1024 * 768)) {
+        debug_blink(11); // 11 piscadas = back buffer muito pequeno
+        return 0;
+    }
+    
     // Debug: 2 piscadas = framebuffer inicializado com sucesso
     debug_blink(2);
     
@@ -172,15 +184,8 @@ int init_framebuffer() {
 }
 
 //Funções de pintura de tela - Para testes de hdmi
-// Pintar tela de azul
+// Pintar tela de azul no back buffer
 void paint_blue_screen() {
-    if (fb_msg.fb_addr == 0) {
-        debug_blink(6); // 6 piscadas = endereço de framebuffer inválido
-        return;
-    }
-    
-    // Converter endereço do framebuffer (remover bit 30 para acesso via CPU)
-    uint32_t* framebuffer = (uint32_t*)(fb_msg.fb_addr & 0x3FFFFFFF);
     
     // Debug: 3 piscadas = começando a pintar
     debug_blink(3);
@@ -192,9 +197,9 @@ void paint_blue_screen() {
     uint32_t pixels_per_line = fb_msg.pitch / 4;
     uint32_t total_pixels = pixels_per_line * fb_msg.virt_height;
     
-    // Pintar todos os pixels de azul
+    // Pintar todos os pixels de azul no back buffer
     for (uint32_t i = 0; i < total_pixels; i++) {
-        framebuffer[i] = blue_color;
+        back_buffer[i] = blue_color;
     }
     
     // Debug: 4 piscadas = tela pintada com sucesso
@@ -202,39 +207,45 @@ void paint_blue_screen() {
 }
 
 void paint_orange_screen() {
-    if (fb_msg.fb_addr == 0) {
-        debug_blink(6); // 6 piscadas = endereço de framebuffer inválido
-        return;
-    }
-    
-    // Converter endereço do framebuffer (remover bit 30 para acesso via CPU)
-    uint32_t* framebuffer = (uint32_t*)(fb_msg.fb_addr & 0x3FFFFFFF);
     
     // Debug: 3 piscadas = começando a pintar
     debug_blink(3);
     
     // Cor laranja em formato ARGB (32 bits)
-    uint32_t blue_color = 0xFFFFA500; // Alpha=255, Red=0, Green=0, Blue=255
+    uint32_t orange_color = 0xFFFFA500; // Alpha=255, Red=255, Green=165, Blue=0
     
     // Calcular número total de pixels baseado no pitch real
     uint32_t pixels_per_line = fb_msg.pitch / 4;
     uint32_t total_pixels = pixels_per_line * fb_msg.virt_height;
     
-    // Pintar todos os pixels de azul
+    // Pintar todos os pixels de laranja no back buffer
     for (uint32_t i = 0; i < total_pixels; i++) {
-        framebuffer[i] = blue_color;
+        back_buffer[i] = orange_color;
     }
     
     // Debug: 4 piscadas = tela pintada com sucesso
     debug_blink(4);
 }
 
-//Função de preenchimento de tela baseada em matriz qualquer
-void fill_screen_from_matrix(uint32_t* matrix, int original_width, int original_height) {
+// Função para copiar back buffer para front buffer (swap buffers)
+void swap_buffers() {
     if (fb_msg.fb_addr == 0) {
         debug_blink(6);
         return;
     }
+    
+    // Converter endereço do framebuffer
+    uint32_t* framebuffer = (uint32_t*)(fb_msg.fb_addr & 0x3FFFFFFF);
+    
+    // Copiar todo o back buffer para o front buffer
+    uint32_t total_pixels = (fb_msg.pitch / 4) * fb_msg.virt_height;
+    
+    // Copy otimizado usando nossa implementação de memcpy
+    memcpy(framebuffer, back_buffer, total_pixels * sizeof(uint32_t));
+}
+
+//Função de preenchimento de tela baseada em matriz qualquer
+void fill_screen_from_matrix(uint32_t* matrix, int original_width, int original_height) {
 
     debug_blink(1); // Debug: função iniciada
 
@@ -249,15 +260,13 @@ void fill_screen_from_matrix(uint32_t* matrix, int original_width, int original_
     int fator_linha = screen_height / original_height;
     int fator_coluna = screen_width / original_width;
 
-    uint32_t* framebuffer = (uint32_t*)(fb_msg.fb_addr & 0x3FFFFFFF);
-
     for (int screen_y = 0; screen_y < screen_height; screen_y++) {
         for (int screen_x = 0; screen_x < screen_width; screen_x++) {
             int original_y = screen_y / fator_linha;
             int original_x = screen_x / fator_coluna;
             
-            // Acesso como array 1D: matrix[y * width + x]
-            framebuffer[screen_y * screen_width + screen_x] = 
+            // Acesso como array 1D: matrix[y * width + x] - renderizar no back buffer
+            back_buffer[screen_y * screen_width + screen_x] = 
                 matrix[original_y * original_width + original_x];
         }
     }

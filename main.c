@@ -47,11 +47,19 @@ void main() {
     };
 
     while(1){
+        // Renderizar bandeira do Brasil no back buffer
         fill_screen_from_matrix((uint32_t*)brasil_matrix, 16, 16);
+        swap_buffers(); // Copiar para front buffer - transição instantânea
         for (volatile int i = 0; i < 10000000; i++);
+        
+        // Renderizar tela azul no back buffer
         paint_blue_screen();
+        swap_buffers(); // Copiar para front buffer - transição instantânea
         for (volatile int i = 0; i < 10000000; i++);
+        
+        // Renderizar tela laranja no back buffer
         paint_orange_screen();
+        swap_buffers(); // Copiar para front buffer - transição instantânea
         for (volatile int i = 0; i < 10000000; i++);
     }
 }
