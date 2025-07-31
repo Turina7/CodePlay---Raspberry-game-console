@@ -18,6 +18,9 @@ int init_framebuffer();
 void paint_blue_screen();
 void paint_orange_screen(); 
 void fill_screen_from_matrix(uint32_t* matrix, int width, int height);
+void clear_back_buffer(uint32_t color);
+void draw_rect_on_back_buffer(int x, int y, int width, int height, uint32_t color);
+
 
 // Sistema de double buffering
 void swap_buffers(); // Copia back buffer -> front buffer (atualiza tela)

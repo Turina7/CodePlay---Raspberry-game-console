@@ -282,3 +282,33 @@ void fill_screen_from_matrix(uint32_t* matrix, int original_width, int original_
 
     debug_blink(4);
 }
+
+// --- Novas Funções de Desenho Direto ---
+
+// Limpa o back buffer com uma cor específica
+void clear_back_buffer(uint32_t color) {
+    uint32_t pixels_per_line = fb_msg.pitch / 4;
+    uint32_t total_pixels = pixels_per_line * fb_msg.virt_height;
+    
+    for (uint32_t i = 0; i < total_pixels; i++) {
+        back_buffer[i] = color;
+    }
+}
+
+// Desenha um retângulo diretamente no back buffer
+void draw_rect_on_back_buffer(int x, int y, int width, int height, uint32_t color) {
+    uint32_t screen_width = fb_msg.pitch / 4;
+
+    // Garante que o retângulo não saia da tela
+    int x_end = x + width;
+    int y_end = y + height;
+    if (x_end > (int)screen_width) x_end = (int)screen_width;
+    if (y_end > (int)fb_msg.virt_height) y_end = (int)fb_msg.virt_height;
+
+    // Desenha o retângulo pixel por pixel
+    for (int cur_y = y; cur_y < y_end; cur_y++) {
+        for (int cur_x = x; cur_x < x_end; cur_x++) {
+            back_buffer[cur_y * screen_width + cur_x] = color;
+        }
+    }
+}
