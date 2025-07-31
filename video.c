@@ -1,8 +1,17 @@
 /*
-*Esse arquivo é parte do projeto VideoPlayer
-*Aqui queremos mapear a saida de vídeo, que é basicamente um framebuffer,
-* em uma matriz de pixels, facil para o usuário manipular.
-*/
+ * Sistema de Vídeo - Console Baremetal Raspberry Pi 2
+ * 
+ * Implementa double buffering para renderização fluída:
+ * - Back buffer: renderização off-screen (RAM)
+ * - Front buffer: framebuffer visível (GPU)
+ * - Swap instantâneo via memcpy otimizado
+ * 
+ * Funcionalidades:
+ * - Inicialização via mailbox property interface
+ * - Renderização de cores sólidas
+ * - Scaling de matrizes pixel-perfect
+ * - Sistema de debug via LED
+ */
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -240,8 +249,31 @@ void swap_buffers() {
     // Copiar todo o back buffer para o front buffer
     uint32_t total_pixels = (fb_msg.pitch / 4) * fb_msg.virt_height;
     
-    // Copy otimizado usando nossa implementação de memcpy
-    memcpy(framebuffer, back_buffer, total_pixels * sizeof(uint32_t));
+    // Copy ultra-otimizado: 8 pixels (32 bytes) por iteração
+    uint32_t* src = back_buffer;
+    uint32_t* dst = framebuffer;
+    uint32_t remaining = total_pixels;
+    
+    // Loop desenrolado para máxima performance
+    while (remaining >= 8) {
+        dst[0] = src[0];
+        dst[1] = src[1];
+        dst[2] = src[2];
+        dst[3] = src[3];
+        dst[4] = src[4];
+        dst[5] = src[5];
+        dst[6] = src[6];
+        dst[7] = src[7];
+        src += 8;
+        dst += 8;
+        remaining -= 8;
+    }
+    
+    // Copiar pixels restantes
+    while (remaining > 0) {
+        *dst++ = *src++;
+        remaining--;
+    }
 }
 
 //Função de preenchimento de tela baseada em matriz qualquer

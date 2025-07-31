@@ -3,7 +3,12 @@
 #include"video.h"
 #include"utils.h"
 
-// Função principal
+/*
+ * Console Baremetal - Raspberry Pi 2
+ * 
+ * Demonstração do sistema de double buffering
+ * com transições instantâneas entre frames.
+ */
 void main() {
     
     // Delay para estabilizar o sistema
