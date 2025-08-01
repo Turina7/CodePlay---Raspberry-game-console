@@ -138,35 +138,35 @@ int init_framebuffer() {
     uint32_t fb_addr = (uint32_t)&fb_msg + 0x40000000;
     
     // Debug: 1 piscada = iniciando framebuffer
-    debug_blink(1);
+    // debug_blink(1);
     
     // Enviar requisição via mailbox (canal 8 = property channel)
     if (!mailbox_write(8, fb_addr)) {
-        debug_blink(10); // 10 piscadas = erro no write
+        // debug_blink(10); // 10 piscadas = erro no write
         return 0;
     }
     
     // Aguardar resposta
     uint32_t result = mailbox_read(8);
     if (result == 0) {
-        debug_blink(9); // 9 piscadas = erro no read
+        // debug_blink(9); // 9 piscadas = erro no read
         return 0;
     }
     
     // Verificar se foi bem-sucedido
     if (fb_msg.code != 0x80000000) {
-        debug_blink(8); // 8 piscadas = código de resposta inválido
+        // debug_blink(8); // 8 piscadas = código de resposta inválido
         return 0;
     }
     
     // Verificar se o framebuffer foi alocado
     if (fb_msg.fb_addr == 0 || fb_msg.fb_size == 0) {
-        debug_blink(7); // 7 piscadas = framebuffer não alocado
+        // debug_blink(7); // 7 piscadas = framebuffer não alocado
         return 0;
     }
     
     // Debug: 2 piscadas = framebuffer inicializado com sucesso
-    debug_blink(2);
+    // debug_blink(2);
     
     return 1;
 }
@@ -175,7 +175,7 @@ int init_framebuffer() {
 // Pintar tela de azul
 void paint_blue_screen() {
     if (fb_msg.fb_addr == 0) {
-        debug_blink(6); // 6 piscadas = endereço de framebuffer inválido
+        // debug_blink(6); // 6 piscadas = endereço de framebuffer inválido
         return;
     }
     
@@ -183,7 +183,7 @@ void paint_blue_screen() {
     uint32_t* framebuffer = (uint32_t*)(fb_msg.fb_addr & 0x3FFFFFFF);
     
     // Debug: 3 piscadas = começando a pintar
-    debug_blink(3);
+    // debug_blink(3);
     
     // Cor azul em formato ARGB (32 bits)
     uint32_t blue_color = 0xFF0000FF; // Alpha=255, Red=0, Green=0, Blue=255
@@ -198,12 +198,12 @@ void paint_blue_screen() {
     }
     
     // Debug: 4 piscadas = tela pintada com sucesso
-    debug_blink(4);
+    // debug_blink(4);
 }
 
 void paint_orange_screen() {
     if (fb_msg.fb_addr == 0) {
-        debug_blink(6); // 6 piscadas = endereço de framebuffer inválido
+        // debug_blink(6); // 6 piscadas = endereço de framebuffer inválido
         return;
     }
     
@@ -211,7 +211,7 @@ void paint_orange_screen() {
     uint32_t* framebuffer = (uint32_t*)(fb_msg.fb_addr & 0x3FFFFFFF);
     
     // Debug: 3 piscadas = começando a pintar
-    debug_blink(3);
+    // debug_blink(3);
     
     // Cor laranja em formato ARGB (32 bits)
     uint32_t blue_color = 0xFFFFA500; // Alpha=255, Red=0, Green=0, Blue=255
@@ -226,23 +226,23 @@ void paint_orange_screen() {
     }
     
     // Debug: 4 piscadas = tela pintada com sucesso
-    debug_blink(4);
+    // debug_blink(4);
 }
 
 //Função de preenchimento de tela baseada em matriz qualquer
 void fill_screen_from_matrix(uint32_t* matrix, int original_width, int original_height) {
     if (fb_msg.fb_addr == 0) {
-        debug_blink(6);
+        // debug_blink(6);
         return;
     }
 
-    debug_blink(1); // Debug: função iniciada
+    // debug_blink(1); // Debug: função iniciada
 
     int screen_width = fb_msg.pitch / 4;
     int screen_height = fb_msg.virt_height;
 
     if (screen_height % original_height != 0 || screen_width % original_width != 0) {
-        debug_blink(5);
+        // debug_blink(5);
         return;
     }
 
@@ -262,5 +262,5 @@ void fill_screen_from_matrix(uint32_t* matrix, int original_width, int original_
         }
     }
 
-    debug_blink(4);
+    // debug_blink(4);
 }

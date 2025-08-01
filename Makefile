@@ -5,11 +5,18 @@ LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
 
+USPIHOME = ./uspi
+LIBS = $(USPIHOME)/lib/libuspi.a \
+       $(USPIHOME)/env/lib/libuspienv.a
+
 # Flags do compilador - otimizado para Raspberry Pi 2
-CFLAGS = -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -nostdlib -nostartfiles -ffreestanding -std=c99 -Wall -Wextra -O2 -g
+CFLAGS = -mcpu=cortex-a7 -mfloat-abi=softfp -nostdlib -nostartfiles -ffreestanding -std=c99 -Wall -Wextra -O2 -g
 
 # Flags do assembler
 ASFLAGS = -mcpu=cortex-a7
+
+INCLUDES = -I$(USPIHOME)/include -I$(USPIHOME)/env/include
+CFLAGS += $(INCLUDES)
 
 # Arquivos fonte
 SOURCES_C = main.c video.c utils.c
@@ -37,7 +44,7 @@ all: $(KERNEL_IMG)
 
 # Linkar para criar ELF
 $(KERNEL_ELF): $(OBJECTS) linker.ld
-	$(LD) -T linker.ld $(OBJECTS) -o $@
+	$(LD) -T linker.ld $(OBJECTS) $(LIBS) -o $@
 
 # Converter ELF para imagem binária
 $(KERNEL_IMG): $(KERNEL_ELF)
