@@ -1,23 +1,22 @@
-//Funções de utilidades não implementas pelo gcc
+// ==================== utils.c ====================
 #include <stdint.h>
-#include <stdlib.h>
+#include "utils.h"
 
 // Endereços base para Raspberry Pi 2
 #define PERIPHERAL_BASE 0x3F000000
-#define MAILBOX_BASE (PERIPHERAL_BASE + 0xB880)
 
 // GPIO para debug LED (GPIO 47 - LED de atividade)
 #define GPIO_BASE (PERIPHERAL_BASE + 0x200000)
 #define GPFSEL4 (*(volatile uint32_t*)(GPIO_BASE + 0x10))
-#define GPSET1  (*(volatile uint32_t*)(GPIO_BASE + 0x20))
-#define GPCLR1  (*(volatile uint32_t*)(GPIO_BASE + 0x2C))
+#define GPSET1 (*(volatile uint32_t*)(GPIO_BASE + 0x20))
+#define GPCLR1 (*(volatile uint32_t*)(GPIO_BASE + 0x2C))
 
 // Função para configurar GPIO para debug
 void init_debug_led() {
     // Configurar GPIO 47 como saída (LED de atividade)
     uint32_t sel = GPFSEL4;
-    sel &= ~(7 << 21);  // Limpar bits 21-23
-    sel |= (1 << 21);   // Configurar como saída
+    sel &= ~(7 << 21); // Limpar bits 21-23
+    sel |= (1 << 21);  // Configurar como saída
     GPFSEL4 = sel;
 }
 
