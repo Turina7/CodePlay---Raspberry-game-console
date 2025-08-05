@@ -1,9 +1,7 @@
-
 // ==================== video.c ====================
 #include <stdint.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include "video.h"
-#include "utils.h"
 
 // Endereços base para Raspberry Pi 2
 #define PERIPHERAL_BASE 0x3F000000
@@ -332,10 +330,10 @@ static uint32_t mailbox_read(uint32_t channel)
     return data & 0xFFFFFFF0;
 }
 
-char tolower(char c)
+static char tolower(char c)
 {
     if (c >= 'A' && c <= 'Z')
-        return c + ('a' - 'A'); // ou return c + 32;
+        return c + ('a' - 'A');
     else
         return c;
 }
@@ -433,7 +431,7 @@ static void get_font(uint32_t (**font)[5], char c)
 int init_framebuffer()
 {
     // Converter endereço para bus address (adicionar 0x40000000 para coherent access)
-    uint32_t fb_addr = (uint32_t)&fb_msg + 0x40000000;
+    uint32_t fb_addr = (uintptr_t)&fb_msg + 0x40000000;
 
     // Enviar requisição via mailbox (canal 8 = property channel)
     if (!mailbox_write(8, fb_addr))
@@ -472,7 +470,7 @@ void paint_blue_screen()
     }
 
     // Converter endereço do framebuffer (remover bit 30 para acesso via CPU)
-    uint32_t *framebuffer = (uint32_t *)(fb_msg.fb_addr & 0x3FFFFFFF);
+    uint32_t *framebuffer = (uint32_t *)(uintptr_t)(fb_msg.fb_addr & 0x3FFFFFFF);
 
     // Cor azul em formato ARGB (32 bits)
     uint32_t blue_color = 0xFF0000FF; // Alpha=255, Red=0, Green=0, Blue=255
@@ -496,8 +494,7 @@ void paint_orange_screen()
     }
 
     // Converter endereço do framebuffer (remover bit 30 para acesso via CPU)
-    uint32_t *framebuffer = (uint32_t *)(fb_msg.fb_addr & 0x3FFFFFFF);
-    ;
+    uint32_t *framebuffer = (uint32_t *)(uintptr_t)(fb_msg.fb_addr & 0x3FFFFFFF);
 
     // Calcular número total de pixels baseado no pitch real
     uint32_t pixels_per_line = fb_msg.pitch / 4;
@@ -529,7 +526,7 @@ void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_
 
     int fator_linha = screen_height / original_height;
     int fator_coluna = screen_width / original_width;
-    uint32_t *framebuffer = (uint32_t *)(fb_msg.fb_addr & 0x3FFFFFFF);
+    uint32_t *framebuffer = (uint32_t *)(uintptr_t)(fb_msg.fb_addr & 0x3FFFFFFF);
 
     for (int screen_y = 0; screen_y < screen_height; screen_y++)
     {
@@ -596,7 +593,7 @@ void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
     }
 
     fill_screen_from_matrix((uint32_t *)text_pixel_matrix, MATRIX_WIDTH - 1, MATRIX_HEIGHT); //-1 pq o último caractere é o espaço em branco
-    
+
     // debug
     /*
     for (int a = 0; a < MATRIX_HEIGHT; a++)

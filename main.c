@@ -1,11 +1,8 @@
 // ==================== main.c ====================
-#include <stdio.h>
-#include <stdlib.h>
 #include "video.h"
-#include "utils.h"
 
 // Função principal
-void main()
+int main()
 {
 
     // Delay para estabilizar o sistema
@@ -50,13 +47,11 @@ void main()
     while (1)
     {
         fill_screen_from_matrix((uint32_t *)brasil_matrix, 16, 16);
-        for (volatile int i = 0; i < 10000000; i++)
-            ;
+        for (volatile int i = 0; i < 10000000; i++);
         write_on_screen(texto);
-        for (volatile int i = 0; i < 10000000; i++)
-            ;
+        for (volatile int i = 0; i < 10000000; i++);
         paint_blue_screen();
-        for (volatile int i = 0; i < 10000000; i++)
-            ;
+        for (volatile int i = 0; i < 10000000; i++);
     }
+    return 0;
 }
