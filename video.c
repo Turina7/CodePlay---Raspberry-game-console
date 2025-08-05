@@ -3,6 +3,10 @@
 #include <stddef.h>
 #include "video.h"
 
+// =============================================================================
+// CONSTANTES DO HARDWARE
+// =============================================================================
+
 // Endereços base para Raspberry Pi 2
 #define PERIPHERAL_BASE 0x3F000000
 #define MAILBOX_BASE (PERIPHERAL_BASE + 0xB880)
@@ -18,6 +22,10 @@
 
 // Canais do mailbox
 #define MAILBOX_CHANNEL_FRAMEBUFFER 1
+
+// =============================================================================
+// ESTRUTURA DO FRAMEBUFFER
+// =============================================================================
 
 // Estrutura de mensagem do framebuffer para mailbox property interface
 struct __attribute__((aligned(16))) mbox_fb_msg
@@ -95,20 +103,17 @@ static struct mbox_fb_msg fb_msg __attribute__((aligned(16))) = {
 
     .end_tag = 0};
 
-// Cores para fonte
-// static const uint32_t red_color = 0xFFFF0000;     // Alpha=255, Red=255, Green=0,   Blue=0
-// static const uint32_t green_color = 0xFF00FF00;   // Alpha=255, Red=0,   Green=255, Blue=0
-// static const uint32_t blue_color = 0xFF0000FF;    // Alpha=255, Red=0,   Green=0,   Blue=255
-// static const uint32_t yellow_color = 0xFFFFFF00;  // Alpha=255, Red=255, Green=255, Blue=0
-// static const uint32_t cyan_color = 0xFF00FFFF;    // Alpha=255, Red=0,   Green=255, Blue=255
-// static const uint32_t magenta_color = 0xFFFF00FF; // Alpha=255, Red=255, Green=0,   Blue=255
-static const uint32_t white_color = 0xFFFFFFFF;   // Alpha=255, Red=255, Green=255, Blue=255
-static const uint32_t black_color = 0xFF000000;   // Alpha=255, Red=0,   Green=0,   Blue=0
-static const uint32_t orange_color = 0xFFFFA500;  // Alpha=255, Red=255, Green=165, Blue=0
-// static const uint32_t gray_color = 0xFF808080;    // Alpha=255, Red=128, Green=128, Blue=128
-// static const uint32_t purple_color = 0xFF800080;  // Alpha=255, Red=128, Green=0,   Blue=128
+// =============================================================================
+// CORES
+// =============================================================================
 
-// Fontes (5x5 pixels cada)
+static const uint32_t white_color = 0xFFFFFFFF;
+static const uint32_t black_color = 0xFF000000;
+
+// =============================================================================
+// SISTEMA DE FONTES 5x5
+// =============================================================================
+
 static uint32_t font_A[5][5] = {
     {black_color, white_color, white_color, white_color, black_color},
     {white_color, black_color, black_color, black_color, white_color},
@@ -291,7 +296,10 @@ static uint32_t font_Z[5][5] = {
     {white_color, white_color, black_color, black_color, black_color},
     {white_color, white_color, white_color, white_color, white_color}};
 
-// Função para escrever no mailbox com timeout
+// =============================================================================
+// FUNÇÕES DE COMUNICAÇÃO COM MAILBOX
+// =============================================================================
+
 static int mailbox_write(uint32_t channel, uint32_t data)
 {
     uint32_t timeout = 1000000;
@@ -427,7 +435,10 @@ static void get_font(uint32_t (**font)[5], char c)
     }
 }
 
-// Inicializar framebuffer usando property mailbox
+// =============================================================================
+// INICIALIZAÇÃO DO FRAMEBUFFER
+// =============================================================================
+
 int init_framebuffer()
 {
     // Converter endereço para bus address (adicionar 0x40000000 para coherent access)
@@ -461,53 +472,10 @@ int init_framebuffer()
     return 1;
 }
 
-// Pintar tela de azul
-void paint_blue_screen()
-{
-    if (fb_msg.fb_addr == 0)
-    {
-        return;
-    }
+// =============================================================================
+// FUNÇÕES DE DESENHO
+// =============================================================================
 
-    // Converter endereço do framebuffer (remover bit 30 para acesso via CPU)
-    uint32_t *framebuffer = (uint32_t *)(uintptr_t)(fb_msg.fb_addr & 0x3FFFFFFF);
-
-    // Cor azul em formato ARGB (32 bits)
-    uint32_t blue_color = 0xFF0000FF; // Alpha=255, Red=0, Green=0, Blue=255
-
-    // Calcular número total de pixels baseado no pitch real
-    uint32_t pixels_per_line = fb_msg.pitch / 4;
-    uint32_t total_pixels = pixels_per_line * fb_msg.virt_height;
-
-    // Pintar todos os pixels de azul
-    for (uint32_t i = 0; i < total_pixels; i++)
-    {
-        framebuffer[i] = blue_color;
-    }
-}
-
-void paint_orange_screen()
-{
-    if (fb_msg.fb_addr == 0)
-    {
-        return;
-    }
-
-    // Converter endereço do framebuffer (remover bit 30 para acesso via CPU)
-    uint32_t *framebuffer = (uint32_t *)(uintptr_t)(fb_msg.fb_addr & 0x3FFFFFFF);
-
-    // Calcular número total de pixels baseado no pitch real
-    uint32_t pixels_per_line = fb_msg.pitch / 4;
-    uint32_t total_pixels = pixels_per_line * fb_msg.virt_height;
-
-    // Pintar todos os pixels de laranja
-    for (uint32_t i = 0; i < total_pixels; i++)
-    {
-        framebuffer[i] = orange_color;
-    }
-}
-
-// Função de preenchimento de tela baseada em matriz qualquer
 void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_height)
 {
     if (fb_msg.fb_addr == 0)
@@ -518,11 +486,7 @@ void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_
     int screen_width = fb_msg.pitch / 4;
     int screen_height = fb_msg.virt_height;
 
-    if (screen_height % original_height != 0 || screen_width % original_width != 0)
-    {
-        // debug_blink(1);
-        return;
-    }
+    // Removida verificação rígida de divisibilidade para permitir escalamento
 
     int fator_linha = screen_height / original_height;
     int fator_coluna = screen_width / original_width;
@@ -541,7 +505,10 @@ void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_
     }
 }
 
-// Escreve uma matriz de caracteres na tela
+// =============================================================================
+// RENDERIZAÇÃO DE TEXTO
+// =============================================================================
+
 void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
 {
     static uint32_t text_pixel_matrix[MATRIX_HEIGHT][MATRIX_WIDTH];
@@ -581,10 +548,7 @@ void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
                         for (int j = 0; j < 5; j++)
                         {
                             uint32_t color = font[i][j];  // Acesso 2D correto
-                            if (color != 0 && color != 0xFF000000)
-                            {
-                                text_pixel_matrix[pixel_y + i][pixel_x + j] = color;
-                            }
+                            text_pixel_matrix[pixel_y + i][pixel_x + j] = color;
                         }
                     }
                 }
@@ -592,38 +556,5 @@ void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
         }
     }
 
-    fill_screen_from_matrix((uint32_t *)text_pixel_matrix, MATRIX_WIDTH - 1, MATRIX_HEIGHT); //-1 pq o último caractere é o espaço em branco
-
-    // debug
-    /*
-    for (int a = 0; a < MATRIX_HEIGHT; a++)
-    {
-        for (int b = 0; b < MATRIX_WIDTH; b++)
-        {
-            uint32_t color = text_pixel_matrix[a][b];
-
-            // Extrai os canais ARGB (Alpha, Red, Green, Blue)
-            uint8_t r = (color >> 16) & 0xFF;
-            uint8_t g = (color >> 8) & 0xFF;
-            uint8_t b_ = color & 0xFF;
-
-            // ANSI para fundo RGB no terminal
-            printf("\x1b[48;2;%d;%d;%dm ", r, g, b_);
-        }
-        printf("\x1b[0m\n"); // Reset e nova linha
-    }*/
+    fill_screen_from_matrix((uint32_t *)text_pixel_matrix, MATRIX_WIDTH, MATRIX_HEIGHT);
 }
-/*
-int main()
-{
-    char texto[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-        "codeplay ",
-        "codeplay ",
-        "codeplay ",
-        "codeplay ",
-        "codeplay ",
-        "codeplay ",
-        "codeplay "};
-    write_on_screen(texto);
-}
-*/

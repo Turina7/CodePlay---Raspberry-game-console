@@ -14,9 +14,7 @@
 
 // Declarações das funções
 int init_framebuffer();
-void paint_blue_screen();
-void paint_orange_screen();
-void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_height);;
+void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_height);
 void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH]);
 
 #endif
