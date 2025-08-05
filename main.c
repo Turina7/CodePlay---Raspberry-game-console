@@ -1,22 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-
 #include "video.h"
 #include "utils.h"
+#include "timer.h"
 
 // USPi
 #include <uspienv.h>
 #include <uspi.h>
 #include <uspios.h>
+#include <uspienv/util.h>
 
 static volatile int g_key_pressed = 0;
 
 // Função chamada quando uma tecla for pressionada
-static void KeyPressedHandler(const char *pString) {
-    (void)pString;
-    g_key_pressed = 1;
+static void KeyPressedHandler (const char *pString)
+{
+	ScreenDeviceWrite (USPiEnvGetScreen (), pString, my_strlen (pString));
 }
 
 
@@ -52,14 +49,60 @@ static void KeyPressedHandler(const char *pString) {
     {0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00},
     };
 
+static const char FromSample[] = "sample";
+
 void main() {
+	if (!USPiEnvInitialize ())
+	{
+		return;
+	}
+	
+	if (!USPiInitialize ())
+	{
+		LogWrite (FromSample, LOG_ERROR, "Cannot initialize USPi");
+
+		USPiEnvClose ();
+
+		return;
+	}
+	
+	if (!USPiKeyboardAvailable ())
+	{
+		LogWrite (FromSample, LOG_ERROR, "Keyboard not found");
+
+		USPiEnvClose ();
+
+		return;
+	}
+
+	USPiKeyboardRegisterKeyPressedHandler (KeyPressedHandler);
+
+	LogWrite (FromSample, LOG_NOTICE, "Just type something!");
+
+	// just wait and turn the rotor
+	for (unsigned nCount = 0; 1; nCount++)
+	{
+		USPiKeyboardUpdateLEDs ();
+
+		ScreenDeviceRotor (USPiEnvGetScreen (), 0, nCount);
+	}
+
+	return;
     // Inicializar framebuffer
-    init_framebuffer();
+    /*init_framebuffer();
     for (volatile int i = 0; i < 10000000; i++);
 
     paint_orange_screen();
     for (volatile int i = 0; i < 10000000; i++);
     for (volatile int i = 0; i < 10000000; i++);
+
+    timer_init();
+
+    delay_ms(100);
+
+    __asm__ volatile("cpsie i");
+
+    delay_ms(100);
 
     // Inicializar ambiente USPi
     debug_blink(1);
@@ -70,6 +113,7 @@ void main() {
 
     debug_blink(3);
     if (!USPiInitialize()) {
+        LogWrite ("teste", LOG_ERROR, "Cannot initialize USPi");
         USPiEnvClose();
         debug_blink(4);
         return;
@@ -77,6 +121,7 @@ void main() {
 
     debug_blink(5);
     if (!USPiKeyboardAvailable()) {
+        LogWrite ("teste", LOG_ERROR, "Keyboard not found");
         USPiEnvClose();
         debug_blink(6);
         return;
@@ -103,5 +148,5 @@ void main() {
             debug_blink(7);
             g_key_pressed = 0; // Zera a flag
         }
-    }
+    }*/
 }

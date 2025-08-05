@@ -1,6 +1,5 @@
 //Funções de utilidades não implementas pelo gcc
 #include <stdint.h>
-#include <stdlib.h>
 
 // Endereços base para Raspberry Pi 2
 #define PERIPHERAL_BASE 0x3F000000
@@ -29,6 +28,14 @@ void debug_blink(int count) {
         GPCLR1 = (1 << 15); // Apagar LED
         for (volatile int j = 0; j < 200000; j++); // Delay
     }
+}
+
+unsigned int my_strlen(const char* str) {
+    unsigned int len = 0;
+    while (str[len] != '\0') {
+        len++;
+    }
+    return len;
 }
 
 // Implementação da função memcpy

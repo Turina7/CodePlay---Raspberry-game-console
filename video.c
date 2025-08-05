@@ -4,8 +4,6 @@
 * em uma matriz de pixels, facil para o usuário manipular.
 */
 
-#include <stdint.h>
-#include <stdlib.h>
 #include "utils.h"
 
 // Endereços base para Raspberry Pi 2

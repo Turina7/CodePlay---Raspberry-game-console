@@ -6,6 +6,8 @@ void init_debug_led();
 
 void debug_blink(int count);
 
+unsigned int my_strlen(const char* str);
+
 // void* memcpy(void* dest, const void* src, unsigned long n);
 
 #endif
