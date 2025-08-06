@@ -15,7 +15,7 @@ int main()
         " BEM VINDO",
         "  AO LAB  ",
         " DE BRUNO ",
-        "   PUSSY  ",
+        "  Basseto ",
         "          ",
         "          "
     };

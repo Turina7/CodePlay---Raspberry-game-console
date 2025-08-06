@@ -1,0 +1,39 @@
+# config.txt - Configuração para Raspberry Pi 2
+
+# Configurações básicas do sistema
+arm_freq=900
+core_freq=250
+sdram_freq=450
+over_voltage=0
+
+# Configurações de vídeo
+hdmi_force_hotplug=1
+hdmi_group=2
+hdmi_mode=16
+hdmi_drive=2
+disable_overscan=1
+
+# Configurações de USB
+max_usb_current=1
+dwc_otg.lpm_enable=0
+dwc_otg.fiq_enable=1
+dwc_otg.fiq_fsm_enable=1
+
+# GPU memory split (mínimo para framebuffer)
+gpu_mem=64
+
+# Configurações de boot
+kernel=kernel.img
+start_file=start.elf
+fixup_file=fixup.dat
+
+# Habilitar UART para debug (opcional)
+enable_uart=1
+uart_2ndstage=1
+
+# Configurações adicionais para estabilidade
+boot_delay=1
+disable_splash=1
+
+# Configurações específicas para USB HID
+dwc_otg.speed=1
