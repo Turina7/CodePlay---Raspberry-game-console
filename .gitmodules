@@ -1,0 +1,3 @@
+[submodule "uspi"]
+	path = uspi
+	url = https://github.com/LucasPapoti/uspi.git

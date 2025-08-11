@@ -2,10 +2,17 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "video.h"
+#include "utils.h"
 
 // =============================================================================
 // CONSTANTES DO HARDWARE
 // =============================================================================
+/*
+*Esse arquivo é parte do projeto VideoPlayer
+*Aqui queremos mapear a saida de vídeo, que é basicamente um framebuffer,
+* em uma matriz de pixels, facil para o usuário manipular.
+*/
+
 
 // Endereços base para Raspberry Pi 2
 #define PERIPHERAL_BASE 0x3F000000
@@ -442,24 +449,27 @@ static void get_font(uint32_t (**font)[5], char c)
 int init_framebuffer()
 {
     // Converter endereço para bus address (adicionar 0x40000000 para coherent access)
-    uint32_t fb_addr = (uintptr_t)&fb_msg + 0x40000000;
-
+    uint32_t fb_addr = (uint32_t)&fb_msg + 0x40000000;
+    
+    // Debug: 1 piscada = iniciando framebuffer
+    // debug_blink>>(1);
+    
     // Enviar requisição via mailbox (canal 8 = property channel)
-    if (!mailbox_write(8, fb_addr))
-    {
+    if (!mailbox_write(8, fb_addr)) {
+        // debug_blink(10); // 10 piscadas = erro no write
         return 0;
     }
 
     // Aguardar resposta
     uint32_t result = mailbox_read(8);
-    if (result == 0)
-    {
+    if (result == 0) {
+        // debug_blink(9); // 9 piscadas = erro no read
         return 0;
     }
 
     // Verificar se foi bem-sucedido
-    if (fb_msg.code != 0x80000000)
-    {
+    if (fb_msg.code != 0x80000000) {
+        // debug_blink(8); // 8 piscadas = código de resposta inválido
         return 0;
     }
 
