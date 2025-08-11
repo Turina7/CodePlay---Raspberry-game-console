@@ -21,7 +21,7 @@ CFLAGS += $(INCLUDES)
 CPPFLAGS = $(INCLUDES)
 
 # Arquivos fonte
-SOURCES_C = main.c video.c utils.c
+SOURCES_C = main.c video.c utils.c teclado.c
 
 # Arquivos objeto
 OBJECTS = $(USPIHOME)/env/lib/startup.o $(SOURCES_C:.c=.o)
