@@ -8,11 +8,10 @@
 // CONSTANTES DO HARDWARE
 // =============================================================================
 /*
-*Esse arquivo é parte do projeto VideoPlayer
-*Aqui queremos mapear a saida de vídeo, que é basicamente um framebuffer,
-* em uma matriz de pixels, facil para o usuário manipular.
-*/
-
+ *Esse arquivo é parte do projeto VideoPlayer
+ *Aqui queremos mapear a saida de vídeo, que é basicamente um framebuffer,
+ * em uma matriz de pixels, facil para o usuário manipular.
+ */
 
 // Endereços base para Raspberry Pi 2
 #define PERIPHERAL_BASE 0x3F000000
@@ -303,6 +302,76 @@ static uint32_t font_Z[5][5] = {
     {white_color, white_color, black_color, black_color, black_color},
     {white_color, white_color, white_color, white_color, white_color}};
 
+static uint32_t font_0[5][5] = {
+    {black_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {black_color, white_color, white_color, white_color, black_color}};
+
+static uint32_t font_1[5][5] = {
+    {black_color, black_color, white_color, black_color, black_color},
+    {black_color, white_color, white_color, black_color, black_color},
+    {black_color, black_color, white_color, black_color, black_color},
+    {black_color, black_color, white_color, black_color, black_color},
+    {black_color, white_color, white_color, white_color, black_color}};
+
+static uint32_t font_2[5][5] = {
+    {black_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {black_color, black_color, white_color, white_color, black_color},
+    {black_color, white_color, black_color, black_color, black_color},
+    {white_color, white_color, white_color, white_color, white_color}};
+
+static uint32_t font_3[5][5] = {
+    {white_color, white_color, white_color, white_color, black_color},
+    {black_color, black_color, black_color, black_color, white_color},
+    {black_color, black_color, white_color, white_color, black_color},
+    {black_color, black_color, black_color, black_color, white_color},
+    {white_color, white_color, white_color, white_color, black_color}};
+
+static uint32_t font_4[5][5] = {
+    {white_color, black_color, black_color, black_color, white_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {white_color, white_color, white_color, white_color, white_color},
+    {black_color, black_color, black_color, black_color, white_color},
+    {black_color, black_color, black_color, black_color, white_color}};
+
+static uint32_t font_5[5][5] = {
+    {white_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, black_color},
+    {white_color, white_color, white_color, white_color, black_color},
+    {black_color, black_color, black_color, black_color, white_color},
+    {white_color, white_color, white_color, white_color, black_color}};
+
+static uint32_t font_6[5][5] = {
+    {black_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, black_color},
+    {white_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {black_color, white_color, white_color, white_color, black_color}};
+
+static uint32_t font_7[5][5] = {
+    {white_color, white_color, white_color, white_color, white_color},
+    {black_color, black_color, black_color, black_color, white_color},
+    {black_color, black_color, black_color, white_color, black_color},
+    {black_color, black_color, white_color, black_color, black_color},
+    {black_color, black_color, white_color, black_color, black_color}};
+
+static uint32_t font_8[5][5] = {
+    {black_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {black_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {black_color, white_color, white_color, white_color, black_color}};
+
+static uint32_t font_9[5][5] = {
+    {black_color, white_color, white_color, white_color, black_color},
+    {white_color, black_color, black_color, black_color, white_color},
+    {black_color, white_color, white_color, white_color, white_color},
+    {black_color, black_color, black_color, black_color, white_color},
+    {black_color, black_color, black_color, black_color, white_color}};
+
 // =============================================================================
 // FUNÇÕES DE COMUNICAÇÃO COM MAILBOX
 // =============================================================================
@@ -436,6 +505,36 @@ static void get_font(uint32_t (**font)[5], char c)
     case 'z':
         *font = font_Z;
         break;
+    case '0':
+        *font = font_0;
+        break;
+    case '1':
+        *font = font_1;
+        break;
+    case '2':
+        *font = font_2;
+        break;
+    case '3':
+        *font = font_3;
+        break;
+    case '4':
+        *font = font_4;
+        break;
+    case '5':
+        *font = font_5;
+        break;
+    case '6':
+        *font = font_6;
+        break;
+    case '7':
+        *font = font_7;
+        break;
+    case '8':
+        *font = font_8;
+        break;
+    case '9':
+        *font = font_9;
+        break;
     default:
         *font = NULL;
         break;
@@ -450,25 +549,28 @@ int init_framebuffer()
 {
     // Converter endereço para bus address (adicionar 0x40000000 para coherent access)
     uint32_t fb_addr = (uint32_t)&fb_msg + 0x40000000;
-    
+
     // Debug: 1 piscada = iniciando framebuffer
     // debug_blink>>(1);
-    
+
     // Enviar requisição via mailbox (canal 8 = property channel)
-    if (!mailbox_write(8, fb_addr)) {
+    if (!mailbox_write(8, fb_addr))
+    {
         // debug_blink(10); // 10 piscadas = erro no write
         return 0;
     }
 
     // Aguardar resposta
     uint32_t result = mailbox_read(8);
-    if (result == 0) {
+    if (result == 0)
+    {
         // debug_blink(9); // 9 piscadas = erro no read
         return 0;
     }
 
     // Verificar se foi bem-sucedido
-    if (fb_msg.code != 0x80000000) {
+    if (fb_msg.code != 0x80000000)
+    {
         // debug_blink(8); // 8 piscadas = código de resposta inválido
         return 0;
     }
@@ -542,7 +644,7 @@ void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
             if (c == '\0')
                 continue;
 
-            uint32_t (*font)[5];  // Ponteiro para array de 5 elementos
+            uint32_t (*font)[5]; // Ponteiro para array de 5 elementos
             get_font(&font, c);
 
             if (font != NULL)
@@ -557,7 +659,7 @@ void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
                     {
                         for (int j = 0; j < 5; j++)
                         {
-                            uint32_t color = font[i][j];  // Acesso 2D correto
+                            uint32_t color = font[i][j]; // Acesso 2D correto
                             text_pixel_matrix[pixel_y + i][pixel_x + j] = color;
                         }
                     }
