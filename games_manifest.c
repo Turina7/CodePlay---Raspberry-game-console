@@ -3,38 +3,6 @@
 #include <stddef.h>
 typedef struct GameEntry GameEntry;
 const GameEntry g_games[] = {
-  { .name = "Example Game", .screen = {
-    " EXAMPLE            ",
-    "                    ",
-    "  HELLO             ",
-    "   FROM             ",
-    "  GAME!             ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-  }, .run = 0 },
-  { .name = "Input Test", .screen = {
-    "  INPUT TEST        ",
-    "                    ",
-    " Use arrows or WASD ",
-    " Press M to menu    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-    "                    ",
-  }, .run = game_input_test_run },
   { .name = "Pong", .screen = {
     "        PONG        ",
     "                    ",
