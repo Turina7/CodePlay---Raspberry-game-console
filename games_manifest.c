@@ -1,0 +1,55 @@
+// Auto-generated. Edit games/* instead.
+#include "games.h"
+#include <stddef.h>
+typedef struct GameEntry GameEntry;
+const GameEntry g_games[] = {
+  { .name = "Example Game", .screen = {
+    " EXAMPLE            ",
+    "                    ",
+    "  HELLO             ",
+    "   FROM             ",
+    "  GAME!             ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+  }, .run = 0 },
+  { .name = "Input Test", .screen = {
+    "  INPUT TEST        ",
+    "                    ",
+    " Use arrows or WASD ",
+    " Press M to menu    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+  }, .run = game_input_test_run },
+  { .name = "Snake", .screen = {
+    "      SNAKE         ",
+    "                    ",
+    "                    ",
+    " Use WASD to move   ",
+    " Press M for menu   ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+    "                    ",
+  }, .run = game_snake_run },
+};
+const size_t g_games_count = sizeof(g_games)/sizeof(g_games[0]);
