@@ -21,6 +21,7 @@ void main() {
     for(int i = 0; i < SCREEN_HEIGHT; i++){
         for(int j = 0; j < SCREEN_WIDTH; j++){
             start_screen[i][j] = 'X';
+            start_screen[SCREEN_HEIGHT - i - 1][SCREEN_WIDTH - j - 1] = 'X';
             write_on_screen(start_screen);
             for (volatile int i = 0; i < 1000000; i++);
         }
