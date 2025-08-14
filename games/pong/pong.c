@@ -39,10 +39,10 @@ static void wait_ticks(volatile unsigned long ticks) {
 void game_pong_run(void) {
     int running = 1;
 
-    // Court
-    const int left_col = 1;
-    const int right_col = SCREEN_WIDTH - 2;
-    const int paddle_height = 5; // must be odd for symmetric drawing
+    // Court: expand play area by using edge columns
+    const int left_col = 0;
+    const int right_col = SCREEN_WIDTH - 1;
+    const int paddle_height = 3; // smaller paddles to open space
 
     int p1_center_row = SCREEN_HEIGHT / 2;
     int p2_center_row = SCREEN_HEIGHT / 2;
@@ -56,6 +56,7 @@ void game_pong_run(void) {
     int score_p2 = 0;
 
     int tick = 0;
+    const int target_score = 5;
 
     while (running) {
         // Input handling
@@ -75,7 +76,8 @@ void game_pong_run(void) {
 
         // Update ball every few ticks for playability
         tick++;
-        if (tick >= 3) {
+        // Slow down ball updates
+        if (tick >= 6) {
             tick = 0;
 
             int next_row = ball_row + ball_dr;
@@ -85,7 +87,7 @@ void game_pong_run(void) {
             if (next_row < 0) { next_row = 0; ball_dr = -ball_dr; }
             if (next_row >= SCREEN_HEIGHT) { next_row = SCREEN_HEIGHT - 1; ball_dr = -ball_dr; }
 
-            // Paddle collision - left
+            // Paddle collision - left (ball approaches from right)
             if (next_col == left_col + 1) {
                 int half = paddle_height / 2;
                 if (next_row >= p1_center_row - half && next_row <= p1_center_row + half) {
@@ -97,7 +99,7 @@ void game_pong_run(void) {
                 }
             }
 
-            // Paddle collision - right
+            // Paddle collision - right (ball approaches from left)
             if (next_col == right_col - 1) {
                 int half = paddle_height / 2;
                 if (next_row >= p2_center_row - half && next_row <= p2_center_row + half) {
@@ -111,18 +113,43 @@ void game_pong_run(void) {
             // Score conditions
             if (next_col < 0) {
                 // P2 scores
-                score_p2 = (score_p2 + 1) % 10;
+                score_p2 = score_p2 + 1;
                 ball_row = SCREEN_HEIGHT / 2;
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p2 % 2 == 0) ? -1 : 1;
                 ball_dc = -1; // serve to left player next
+                if (score_p2 >= target_score) {
+                    // Winner: P2
+                    clear_screen();
+                    draw_string(SCREEN_HEIGHT/2 - 1, 3, "PLAYER 2 WINS!");
+                    draw_string(SCREEN_HEIGHT/2 + 1, 2, "PRESS M FOR MENU");
+                    write_on_screen((const char (*)[SCREEN_WIDTH])screen);
+                    // Wait for menu key
+                    while (1) {
+                        if (g_last_key == 'm' || g_last_key == 'M') break;
+                        wait_ticks(60000);
+                    }
+                    running = 0;
+                }
             } else if (next_col >= SCREEN_WIDTH) {
                 // P1 scores
-                score_p1 = (score_p1 + 1) % 10;
+                score_p1 = score_p1 + 1;
                 ball_row = SCREEN_HEIGHT / 2;
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p1 % 2 == 0) ? -1 : 1;
                 ball_dc = 1; // serve to right player next
+                if (score_p1 >= target_score) {
+                    // Winner: P1
+                    clear_screen();
+                    draw_string(SCREEN_HEIGHT/2 - 1, 3, "PLAYER 1 WINS!");
+                    draw_string(SCREEN_HEIGHT/2 + 1, 2, "PRESS M FOR MENU");
+                    write_on_screen((const char (*)[SCREEN_WIDTH])screen);
+                    while (1) {
+                        if (g_last_key == 'm' || g_last_key == 'M') break;
+                        wait_ticks(60000);
+                    }
+                    running = 0;
+                }
             } else {
                 ball_row = next_row;
                 ball_col = next_col;
@@ -132,14 +159,14 @@ void game_pong_run(void) {
         // Render
         clear_screen();
 
-        // Center line (use sparse 'I' markers)
-        for (int r = 1; r < SCREEN_HEIGHT; r += 2) {
-            screen[r][SCREEN_WIDTH / 2] = 'I';
+        // Optional: very sparse center guide
+        for (int r = 2; r < SCREEN_HEIGHT; r += 3) {
+            screen[r][SCREEN_WIDTH / 2] = ':';
         }
 
-        // Scores at top center
-        screen[0][SCREEN_WIDTH/2 - 2] = (char)('0' + (score_p1 % 10));
-        screen[0][SCREEN_WIDTH/2 + 2] = (char)('0' + (score_p2 % 10));
+        // Scores at top corners
+        screen[0][2] = (char)('0' + (score_p1 % 10));
+        screen[0][SCREEN_WIDTH - 3] = (char)('0' + (score_p2 % 10));
 
         // Paddles
         draw_paddle(p1_center_row, left_col, paddle_height);
@@ -151,6 +178,6 @@ void game_pong_run(void) {
         }
 
         write_on_screen((const char (*)[SCREEN_WIDTH])screen);
-        wait_ticks(40000);
+        wait_ticks(45000);
     }
 }
