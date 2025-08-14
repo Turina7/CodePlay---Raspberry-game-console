@@ -47,24 +47,24 @@ void main() {
 
                 if (g_last_key == '1'){
                     char snake_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-                        " SNAKE GAME",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           "
+                        "SNAKE GAME",
+                        "          ",
+                        "          ",
+                        "          ",
+                        "          ",
+                        "          ",
+                        "          "
                     };
                     write_on_screen(snake_screen);
                 } else if (g_last_key == '2') {
                     char tetris_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-                        "TETRIS GAME",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           "
+                        "TETRISGAME",
+                        "          ",
+                        "          ",
+                        "          ",
+                        "          ",
+                        "          ",
+                        "          "
                     };
                     write_on_screen(tetris_screen);
                 } else if (g_last_key == '3') {
