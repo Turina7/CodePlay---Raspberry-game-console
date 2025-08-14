@@ -270,7 +270,7 @@ void game_pong_run(void) {
             if (updates_since_serve % 8 == 0) {
                 if (tick_threshold > 1) tick_threshold -= 1;
                 if (frame_delay_ticks > 20000) {
-                    frame_delay_ticks -= 2000;
+                    frame_delay_ticks  *= 0.8;
                     if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
                 }
             }
