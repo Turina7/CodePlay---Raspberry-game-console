@@ -14,6 +14,7 @@ static void clear_screen(void) {
 
 // Colored 5x5 emojis (borrowed concept from Snake)
 static const unsigned int COLOR_BLACK = 0xFF000000;
+static const unsigned int COLOR_WHITE = 0xFFFFFFFF;
 static const unsigned int COLOR_GREEN = 0xFF00FF00; // P1 paddle
 static const unsigned int COLOR_BLUE  = 0xFF0000FF; // P2 paddle
 static const unsigned int COLOR_RED   = 0xFFFF0000; // Ball
@@ -42,6 +43,87 @@ static unsigned int font_ball_red[5][5] = {
     {COLOR_BLACK, COLOR_BLACK, COLOR_RED,   COLOR_BLACK, COLOR_BLACK}
 };
 
+// Center net (:) glyph (white dots)
+static unsigned int font_colon[5][5] = {
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK}
+};
+
+// White digits 0..9 for scoreboard
+static unsigned int font_d0[5][5] = {
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK}
+};
+static unsigned int font_d1[5][5] = {
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK}
+};
+static unsigned int font_d2[5][5] = {
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE}
+};
+static unsigned int font_d3[5][5] = {
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK}
+};
+static unsigned int font_d4[5][5] = {
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE}
+};
+static unsigned int font_d5[5][5] = {
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK}
+};
+static unsigned int font_d6[5][5] = {
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK}
+};
+static unsigned int font_d7[5][5] = {
+    {COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK}
+};
+static unsigned int font_d8[5][5] = {
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK}
+};
+static unsigned int font_d9[5][5] = {
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_BLACK},
+    {COLOR_WHITE, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_WHITE}
+};
+
 static void get_pong_font(unsigned int (**font)[5], char c)
 {
     switch (c)
@@ -55,6 +137,19 @@ static void get_pong_font(unsigned int (**font)[5], char c)
     case 'a':
         *font = font_ball_red;
         break;
+    case ':':
+        *font = font_colon;
+        break;
+    case '0': *font = font_d0; break;
+    case '1': *font = font_d1; break;
+    case '2': *font = font_d2; break;
+    case '3': *font = font_d3; break;
+    case '4': *font = font_d4; break;
+    case '5': *font = font_d5; break;
+    case '6': *font = font_d6; break;
+    case '7': *font = font_d7; break;
+    case '8': *font = font_d8; break;
+    case '9': *font = font_d9; break;
     default:
         *font = NULL;
         break;
@@ -138,6 +233,7 @@ void game_pong_run(void) {
 
     int tick = 0;
     const int target_score = 5;
+    int tick_threshold = 6; // start slower
 
     while (running) {
         // Input handling
@@ -157,8 +253,8 @@ void game_pong_run(void) {
 
         // Update ball every few ticks for playability
         tick++;
-        // Slow down ball updates
-        if (tick >= 6) {
+        // Update cadence with difficulty
+        if (tick >= tick_threshold) {
             tick = 0;
 
             int next_row = ball_row + ball_dr;
@@ -212,6 +308,8 @@ void game_pong_run(void) {
                     }
                     running = 0;
                 }
+                // Increase difficulty each score
+                if (tick_threshold > 2) tick_threshold--;
             } else if (next_col >= SCREEN_WIDTH) {
                 // P1 scores
                 score_p1 = score_p1 + 1;
@@ -231,6 +329,7 @@ void game_pong_run(void) {
                     }
                     running = 0;
                 }
+                if (tick_threshold > 2) tick_threshold--;
             } else {
                 ball_row = next_row;
                 ball_col = next_col;
@@ -245,9 +344,9 @@ void game_pong_run(void) {
             screen[r][SCREEN_WIDTH / 2] = ':';
         }
 
-        // Scores (up to 5): render as count of small paddle blocks
-        for (int i = 0; i < score_p1 && i < 5; ++i) screen[0][1 + i] = 'A';
-        for (int i = 0; i < score_p2 && i < 5; ++i) screen[0][SCREEN_WIDTH - 2 - i] = 'B';
+        // Scores as digits (white)
+        screen[0][2] = (char)('0' + (score_p1 % 10));
+        screen[0][SCREEN_WIDTH - 3] = (char)('0' + (score_p2 % 10));
 
         // Paddles (colored using custom emoji 'A' and 'B')
         draw_paddle(p1_center_row, left_col, paddle_height, 'A');
