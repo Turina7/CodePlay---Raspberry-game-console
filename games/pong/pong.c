@@ -233,7 +233,8 @@ void game_pong_run(void) {
 
     int tick = 0;
     const int target_score = 5;
-    int tick_threshold = 6; // start slower
+    int tick_threshold = 8; // start slower, more headroom to ramp
+    int frame_delay_ticks = 45000; // base frame delay, will decrease
 
     while (running) {
         // Input handling
@@ -295,6 +296,13 @@ void game_pong_run(void) {
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p2 % 2 == 0) ? -1 : 1;
                 ball_dc = -1; // serve to left player next
+                // Increase difficulty each score
+                if (tick_threshold > 1) tick_threshold = (tick_threshold > 2) ? tick_threshold - 2 : 1;
+                if (frame_delay_ticks > 20000) {
+                    frame_delay_ticks -= 5000;
+                    if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
+                }
+
                 if (score_p2 >= target_score) {
                     // Winner: P2
                     clear_screen();
@@ -308,8 +316,6 @@ void game_pong_run(void) {
                     }
                     running = 0;
                 }
-                // Increase difficulty each score
-                if (tick_threshold > 2) tick_threshold--;
             } else if (next_col >= SCREEN_WIDTH) {
                 // P1 scores
                 score_p1 = score_p1 + 1;
@@ -317,6 +323,13 @@ void game_pong_run(void) {
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p1 % 2 == 0) ? -1 : 1;
                 ball_dc = 1; // serve to right player next
+                // Increase difficulty each score
+                if (tick_threshold > 1) tick_threshold = (tick_threshold > 2) ? tick_threshold - 2 : 1;
+                if (frame_delay_ticks > 20000) {
+                    frame_delay_ticks -= 5000;
+                    if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
+                }
+
                 if (score_p1 >= target_score) {
                     // Winner: P1
                     clear_screen();
@@ -329,7 +342,6 @@ void game_pong_run(void) {
                     }
                     running = 0;
                 }
-                if (tick_threshold > 2) tick_threshold--;
             } else {
                 ball_row = next_row;
                 ball_col = next_col;
@@ -358,6 +370,6 @@ void game_pong_run(void) {
         }
 
         plot_emoji_pong((const char (*)[SCREEN_WIDTH])screen);
-        wait_ticks(45000);
+        wait_ticks((volatile unsigned long)frame_delay_ticks);
     }
 }
