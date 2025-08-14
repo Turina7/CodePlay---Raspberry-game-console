@@ -9,32 +9,22 @@ void main() {
     // Delay para estabilizar o sistema
     for (volatile int i = 0; i < 1000000; i++);
 
-    // Colorful intro animation using pixel matrix directly
-    {
-        static uint32_t intro[MATRIX_HEIGHT][MATRIX_WIDTH];
-        // Clear
-        for (int y = 0; y < MATRIX_HEIGHT; ++y) for (int x = 0; x < MATRIX_WIDTH; ++x) intro[y][x] = 0xFF000000;
-        // Sweep stripes with changing colors
-        for (int step = 0; step < MATRIX_WIDTH; step += 2) {
-            uint32_t color = 0xFF0000FF;
-            if ((step / 10) % 3 == 1) color = 0xFF00FF00;
-            else if ((step / 10) % 3 == 2) color = 0xFFFFFF00;
-            for (int y = 0; y < MATRIX_HEIGHT; ++y) {
-                int x = step;
-                if (x < MATRIX_WIDTH) intro[y][x] = color;
-                if (x+1 < MATRIX_WIDTH) intro[y][x+1] = color;
-            }
-            fill_screen_from_matrix((uint32_t *)intro, MATRIX_WIDTH, MATRIX_HEIGHT);
-            for (volatile int d = 0; d < 70000; ++d) __asm__ __volatile__("nop");
+    char start_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
+    for (int r = 0; r < SCREEN_HEIGHT; ++r) {
+        for (int c = 0; c < SCREEN_WIDTH; ++c) start_screen[r][c] = ' ';
+    }
+    const char *banner = " CODEPLAY ";
+    for (int i = 0; i < SCREEN_WIDTH && banner[i]; ++i) start_screen[SCREEN_HEIGHT/2][i] = banner[i];
+    write_on_screen(start_screen);
+    for (volatile int i = 0; i < 1000000; i++);
+
+    for(int i = 0; i < SCREEN_HEIGHT; i++){
+        for(int j = 0; j < SCREEN_WIDTH; j++){
+            start_screen[i][j] = 'X';
+            start_screen[SCREEN_HEIGHT - i - 1][SCREEN_WIDTH - j - 1] = 'X';
+            write_on_screen(start_screen);
+            for (volatile int i = 0; i < 1000000; i++);
         }
-        // Render CODEPLAY centered
-        char logo[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
-        for (int r = 0; r < SCREEN_HEIGHT; ++r) for (int c = 0; c < SCREEN_WIDTH; ++c) logo[r][c] = ' ';
-        const char *title = " CODEPLAY ";
-        int start_col = (SCREEN_WIDTH - 10) / 2;
-        for (int i = 0; title[i] && (start_col + i) < SCREEN_WIDTH; ++i) logo[SCREEN_HEIGHT/2][start_col + i] = title[i];
-        write_on_screen(logo);
-        for (volatile int d = 0; d < 500000; ++d) __asm__ __volatile__("nop");
     }
 
     // Montar tela dinamicamente com até 6 primeiras entradas

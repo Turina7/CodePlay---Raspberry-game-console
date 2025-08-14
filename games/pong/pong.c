@@ -265,15 +265,9 @@ void game_pong_run(void) {
             int next_row = ball_row + ball_dr;
             int next_col = ball_col + ball_dc;
 
-            // Linear difficulty ramp within a rally (every N updates)
+            // Linear difficulty ramp within a rally: increase on paddle hits (handled below)
             updates_since_serve++;
-            if (updates_since_serve % 8 == 0) {
-                if (tick_threshold > 1) tick_threshold -= 1;
-                if (frame_delay_ticks > 20000) {
-                    frame_delay_ticks  *= 0.8;
-                    if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
-                }
-            }
+            // Note: proportional speed-up now happens only on paddle collisions
 
             // Bounce on top/bottom and clamp
             if (next_row < 0) { next_row = 0; ball_dr = -ball_dr; }
@@ -288,6 +282,9 @@ void game_pong_run(void) {
                     // Add a bit of vertical change based on hit position
                     if (next_row < p1_center_row) ball_dr = -1;
                     else if (next_row > p1_center_row) ball_dr = 1;
+                    // Proportional speed-up on paddle hit (~20%)
+                    int new_threshold = (tick_threshold * 4) / 5; if (new_threshold < 1) new_threshold = 1; tick_threshold = new_threshold;
+                    int new_delay = (frame_delay_ticks * 4) / 5; if (new_delay < 20000) new_delay = 20000; frame_delay_ticks = new_delay;
                 }
             }
 
@@ -299,6 +296,9 @@ void game_pong_run(void) {
                     ball_dc = -ball_dc;
                     if (next_row < p2_center_row) ball_dr = -1;
                     else if (next_row > p2_center_row) ball_dr = 1;
+                    // Proportional speed-up on paddle hit (~20%)
+                    int new_threshold = (tick_threshold * 4) / 5; if (new_threshold < 1) new_threshold = 1; tick_threshold = new_threshold;
+                    int new_delay = (frame_delay_ticks * 4) / 5; if (new_delay < 20000) new_delay = 20000; frame_delay_ticks = new_delay;
                 }
             }
 
