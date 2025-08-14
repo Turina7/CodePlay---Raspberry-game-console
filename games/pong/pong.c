@@ -12,6 +12,87 @@ static void clear_screen(void) {
     }
 }
 
+// Colored 5x5 emojis (borrowed concept from Snake)
+static const unsigned int COLOR_BLACK = 0xFF000000;
+static const unsigned int COLOR_GREEN = 0xFF00FF00; // P1 paddle
+static const unsigned int COLOR_BLUE  = 0xFF0000FF; // P2 paddle
+static const unsigned int COLOR_RED   = 0xFFFF0000; // Ball
+
+static unsigned int font_paddle_green[5][5] = {
+    {COLOR_BLACK, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_BLACK},
+    {COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN},
+    {COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN},
+    {COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN},
+    {COLOR_BLACK, COLOR_GREEN, COLOR_GREEN, COLOR_GREEN, COLOR_BLACK}
+};
+
+static unsigned int font_paddle_blue[5][5] = {
+    {COLOR_BLACK, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLACK},
+    {COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE},
+    {COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE},
+    {COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE},
+    {COLOR_BLACK, COLOR_BLUE, COLOR_BLUE, COLOR_BLUE, COLOR_BLACK}
+};
+
+static unsigned int font_ball_red[5][5] = {
+    {COLOR_BLACK, COLOR_BLACK, COLOR_RED,   COLOR_BLACK, COLOR_BLACK},
+    {COLOR_BLACK, COLOR_RED,   COLOR_RED,   COLOR_RED,   COLOR_BLACK},
+    {COLOR_RED,   COLOR_RED,   COLOR_RED,   COLOR_RED,   COLOR_RED  },
+    {COLOR_BLACK, COLOR_RED,   COLOR_RED,   COLOR_RED,   COLOR_BLACK},
+    {COLOR_BLACK, COLOR_BLACK, COLOR_RED,   COLOR_BLACK, COLOR_BLACK}
+};
+
+static void get_pong_font(unsigned int (**font)[5], char c)
+{
+    switch (c)
+    {
+    case 'A':
+        *font = font_paddle_green;
+        break;
+    case 'B':
+        *font = font_paddle_blue;
+        break;
+    case 'a':
+        *font = font_ball_red;
+        break;
+    default:
+        *font = NULL;
+        break;
+    }
+}
+
+static void plot_emoji_pong(const char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
+{
+    static uint32_t pixel_matrix[MATRIX_HEIGHT][MATRIX_WIDTH];
+    // Clear to black
+    for (int i = 0; i < MATRIX_HEIGHT; ++i) {
+        for (int j = 0; j < MATRIX_WIDTH; ++j) {
+            pixel_matrix[i][j] = COLOR_BLACK;
+        }
+    }
+    // Draw known emoji glyphs
+    for (int row = 0; row < SCREEN_HEIGHT; ++row) {
+        for (int col = 0; col < SCREEN_WIDTH; ++col) {
+            char ch = text_matrix[row][col];
+            if (ch == '\0' || ch == ' ') continue;
+            unsigned int (*font)[5];
+            get_pong_font(&font, ch);
+            if (!font) continue; // unknown glyphs ignored (saves code size)
+
+            int px = col * CHAR_WIDTH;
+            int py = row * CHAR_HEIGHT;
+            if (px + 5 <= MATRIX_WIDTH && py + 5 <= MATRIX_HEIGHT) {
+                for (int i = 0; i < 5; ++i) {
+                    for (int j = 0; j < 5; ++j) {
+                        pixel_matrix[py + i][px + j] = font[i][j];
+                    }
+                }
+            }
+        }
+    }
+    fill_screen_from_matrix((uint32_t *)pixel_matrix, MATRIX_WIDTH, MATRIX_HEIGHT);
+}
+
 static void draw_string(int row, int col, const char *s) {
     for (int i = 0; s[i] && col + i < SCREEN_WIDTH; ++i) {
         char ch = s[i];
@@ -83,12 +164,12 @@ void game_pong_run(void) {
             int next_row = ball_row + ball_dr;
             int next_col = ball_col + ball_dc;
 
-            // Bounce on top/bottom
+            // Bounce on top/bottom and clamp
             if (next_row < 0) { next_row = 0; ball_dr = -ball_dr; }
-            if (next_row >= SCREEN_HEIGHT) { next_row = SCREEN_HEIGHT - 1; ball_dr = -ball_dr; }
+            else if (next_row >= SCREEN_HEIGHT) { next_row = SCREEN_HEIGHT - 1; ball_dr = -ball_dr; }
 
             // Paddle collision - left (ball approaches from right)
-            if (next_col == left_col + 1) {
+            if (next_col <= left_col + 1) {
                 int half = paddle_height / 2;
                 if (next_row >= p1_center_row - half && next_row <= p1_center_row + half) {
                     next_col = left_col + 1; // just in front of paddle
@@ -100,7 +181,7 @@ void game_pong_run(void) {
             }
 
             // Paddle collision - right (ball approaches from left)
-            if (next_col == right_col - 1) {
+            if (next_col >= right_col - 1) {
                 int half = paddle_height / 2;
                 if (next_row >= p2_center_row - half && next_row <= p2_center_row + half) {
                     next_col = right_col - 1;
@@ -164,12 +245,12 @@ void game_pong_run(void) {
             screen[r][SCREEN_WIDTH / 2] = ':';
         }
 
-        // Scores at top corners
-        screen[0][2] = (char)('0' + (score_p1 % 10));
-        screen[0][SCREEN_WIDTH - 3] = (char)('0' + (score_p2 % 10));
+        // Scores (up to 5): render as count of small paddle blocks
+        for (int i = 0; i < score_p1 && i < 5; ++i) screen[0][1 + i] = 'A';
+        for (int i = 0; i < score_p2 && i < 5; ++i) screen[0][SCREEN_WIDTH - 2 - i] = 'B';
 
-        // Paddles (colored using Snake font mapping: 'b' body green, 'B' body blue)
-        draw_paddle(p1_center_row, left_col, paddle_height, 'b');
+        // Paddles (colored using custom emoji 'A' and 'B')
+        draw_paddle(p1_center_row, left_col, paddle_height, 'A');
         draw_paddle(p2_center_row, right_col, paddle_height, 'B');
 
         // Ball: use 'a' to render as red apple from Snake font
@@ -177,7 +258,7 @@ void game_pong_run(void) {
             screen[ball_row][ball_col] = 'a';
         }
 
-        write_on_screen((const char (*)[SCREEN_WIDTH])screen);
+        plot_emoji_pong((const char (*)[SCREEN_WIDTH])screen);
         wait_ticks(45000);
     }
 }
