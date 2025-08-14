@@ -16,7 +16,7 @@ void main() {
     const char *banner = " CODEPLAY ";
     for (int i = 0; i < SCREEN_WIDTH && banner[i]; ++i) start_screen[SCREEN_HEIGHT/2][i] = banner[i];
     write_on_screen(start_screen);
-    for (volatile int i = 0; i < 100000000; i++);
+    for (volatile int i = 0; i < 1000000; i++);
 
     for(int i = 0; i < SCREEN_HEIGHT; i++){
         for(int j = 0; j < SCREEN_WIDTH; j++){
