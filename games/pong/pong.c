@@ -233,8 +233,12 @@ void game_pong_run(void) {
 
     int tick = 0;
     const int target_score = 5;
-    int tick_threshold = 8; // start slower, more headroom to ramp
-    int frame_delay_ticks = 45000; // base frame delay, will decrease
+    // Initial speeds
+    const int initial_tick_threshold = 8;
+    const int initial_frame_delay_ticks = 45000;
+    int tick_threshold = initial_tick_threshold;
+    int frame_delay_ticks = initial_frame_delay_ticks;
+    int updates_since_serve = 0; // linear ramp driver during a rally
 
     while (running) {
         // Input handling
@@ -260,6 +264,16 @@ void game_pong_run(void) {
 
             int next_row = ball_row + ball_dr;
             int next_col = ball_col + ball_dc;
+
+            // Linear difficulty ramp within a rally (every N updates)
+            updates_since_serve++;
+            if (updates_since_serve % 8 == 0) {
+                if (tick_threshold > 1) tick_threshold -= 1;
+                if (frame_delay_ticks > 20000) {
+                    frame_delay_ticks -= 2000;
+                    if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
+                }
+            }
 
             // Bounce on top/bottom and clamp
             if (next_row < 0) { next_row = 0; ball_dr = -ball_dr; }
@@ -296,12 +310,10 @@ void game_pong_run(void) {
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p2 % 2 == 0) ? -1 : 1;
                 ball_dc = -1; // serve to left player next
-                // Increase difficulty each score
-                if (tick_threshold > 1) tick_threshold = (tick_threshold > 2) ? tick_threshold - 2 : 1;
-                if (frame_delay_ticks > 20000) {
-                    frame_delay_ticks -= 5000;
-                    if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
-                }
+                // Reset difficulty at each score
+                tick_threshold = initial_tick_threshold;
+                frame_delay_ticks = initial_frame_delay_ticks;
+                updates_since_serve = 0;
 
                 if (score_p2 >= target_score) {
                     // Winner: P2
@@ -323,12 +335,10 @@ void game_pong_run(void) {
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p1 % 2 == 0) ? -1 : 1;
                 ball_dc = 1; // serve to right player next
-                // Increase difficulty each score
-                if (tick_threshold > 1) tick_threshold = (tick_threshold > 2) ? tick_threshold - 2 : 1;
-                if (frame_delay_ticks > 20000) {
-                    frame_delay_ticks -= 5000;
-                    if (frame_delay_ticks < 20000) frame_delay_ticks = 20000;
-                }
+                // Reset difficulty at each score
+                tick_threshold = initial_tick_threshold;
+                frame_delay_ticks = initial_frame_delay_ticks;
+                updates_since_serve = 0;
 
                 if (score_p1 >= target_score) {
                     // Winner: P1
