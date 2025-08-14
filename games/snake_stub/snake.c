@@ -21,6 +21,35 @@ static const uint32_t black = 0xFF000000;
 static const uint32_t redxx = 0xFFFF0000;
 static const uint32_t blue = 0xFF0000FF;
 
+void writeVictory1(){
+    char win_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
+    for (int r = 0; r < SCREEN_HEIGHT; ++r) {
+        for (int c = 0; c < SCREEN_WIDTH; ++c) win_screen[r][c] = ' ';
+    }
+    const char *banner = " Green Player Wins ";
+    for (int i = 0; i < SCREEN_WIDTH && banner[i]; ++i) win_screen[SCREEN_HEIGHT/2][i] = banner[i];
+    write_on_screen(win_screen);
+}
+
+void writeVictory2(){
+    char win_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
+    for (int r = 0; r < SCREEN_HEIGHT; ++r) {
+        for (int c = 0; c < SCREEN_WIDTH; ++c) win_screen[r][c] = ' ';
+    }
+    const char *banner = " Blue Player Wins ";
+    for (int i = 0; i < SCREEN_WIDTH && banner[i]; ++i) win_screen[SCREEN_HEIGHT/2][i] = banner[i];
+    write_on_screen(win_screen);
+}
+
+void writeTie(){
+    char win_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
+    for (int r = 0; r < SCREEN_HEIGHT; ++r) {
+        for (int c = 0; c < SCREEN_WIDTH; ++c) win_screen[r][c] = ' ';
+    }
+    const char *banner = " Its a fucking tie ";
+    for (int i = 0; i < SCREEN_WIDTH && banner[i]; ++i) win_screen[SCREEN_HEIGHT/2][i] = banner[i];
+    write_on_screen(win_screen);
+}
 
 
 static uint32_t font_snake_head[5][5] = {
@@ -184,37 +213,43 @@ void game_snake_run(void) {
     snake_len1 = 3;
     int updateMov = 0;
     int head_r1 = SCREEN_HEIGHT/2;
-    int head_c1 = SCREEN_WIDTH/2;
+    int head_c1 = SCREEN_WIDTH/4;
     int dr1 = 0, dc1 = 1; // direita
 
     snake_len2 = 3;
     int head_r2 = SCREEN_HEIGHT/2;
-    int head_c2 = SCREEN_WIDTH/2;
+    int head_c2 = 3*SCREEN_WIDTH/4;
     int dr2 = 0, dc2 = 1; // direita
+
+    snake_r1[0] = head_r1;
+    snake_c1[0] = head_c1;
+
+    snake_r2[0] = head_r2;
+    snake_c2[0] = head_c2;
 
 
     while (running) {
         if (g_key_pressed_p1) {
             char k1 = g_last_key_p1;
             g_key_pressed_p1 = 0;
-            if (k1 == 'w') { dr1 = -1; dc1 = 0; }
-            else if (k1 == 's') { dr1 = 1; dc1 = 0; }
-            else if (k1 == 'a') { dr1 = 0; dc1 = -1; }
-            else if (k1 == 'd') { dr1 = 0; dc1 = 1; }
+            if (k1 == 'w' && dr1 == 0) { dr1 = -1; dc1 = 0; }
+            else if (k1 == 's' && dr1 == 0) { dr1 = 1; dc1 = 0; }
+            else if (k1 == 'a' && dc1 == 0) { dr1 = 0; dc1 = -1; }
+            else if (k1 == 'd' && dc1 == 0) { dr1 = 0; dc1 = 1; }
         }
         if (g_key_pressed_p2) {
             char k2 = g_last_key_p2;
             g_key_pressed_p2 = 0;
-            if (k2 == 'w') { dr2 = -1; dc2 = 0; }
-            else if (k2 == 's') { dr2 = 1; dc2 = 0; }
-            else if (k2 == 'a') { dr2 = 0; dc2 = -1; }
-            else if (k2 == 'd') { dr2 = 0; dc2 = 1; }
+            if (k2 == 'w' && dr2 == 0) { dr2 = -1; dc2 = 0; }
+            else if (k2 == 's' && dr2 == 0) { dr2 = 1; dc2 = 0; }
+            else if (k2 == 'a' && dc2 == 0) { dr2 = 0; dc2 = -1; }
+            else if (k2 == 'd' && dc2 == 0) { dr2 = 0; dc2 = 1; }
         }
 
         if (g_last_key == 'm') { running = 0; break; }
 
         updateMov += 1;
-        if (updateMov > 10){ 
+        if (updateMov > 8){ 
             head_r1 += dr1; head_c1 += dc1; updateMov = 0;
             if (head_r1 < 0) head_r1 = SCREEN_HEIGHT-1;
             if (head_r1 >= SCREEN_HEIGHT) head_r1 = 0;
@@ -250,21 +285,37 @@ void game_snake_run(void) {
             for (int i = 1; i < snake_len1; ++i) {
                 if (next_head_r1 == snake_r1[i] && next_head_c1 == snake_c1[i]) {
                     running = 0; // Game Over
+                    writeVictory2();
+                    while( g_last_key != 'm' && g_last_key != 'M' ){wait_ms(60000);}
                     break;
                 }
                 if (next_head_r2 == snake_r1[i] && next_head_c2 == snake_c1[i]) {
                     running = 0; // Game Over
+                    writeVictory1();
+                    while( g_last_key != 'm' && g_last_key != 'M' ){wait_ms(60000);}
                     break;
                 }
             }
 
+            if (next_head_r2 == next_head_r1 && next_head_c2 == next_head_c1) {
+                running = 0; // Game Over
+                writeTie();
+                while( g_last_key != 'm' && g_last_key != 'M' ){wait_ms(60000);}
+                break;
+            }
+
+
             for (int i = 1; i < snake_len2; ++i) {
                 if (next_head_r1 == snake_r2[i] && next_head_c1 == snake_c2[i]) {
                     running = 0; // Game Over
+                    writeVictory2();
+                    while( g_last_key != 'm' && g_last_key != 'M' ){wait_ms(60000);}
                     break;
                 }
                 if (next_head_r2 == snake_r2[i] && next_head_c2 == snake_c2[i]) {
                     running = 0; // Game Over
+                    writeVictory1();
+                    while( g_last_key != 'm' && g_last_key != 'M' ){wait_ms(60000);}
                     break;
                 }
             }
