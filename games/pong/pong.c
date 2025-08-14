@@ -20,12 +20,12 @@ static void draw_string(int row, int col, const char *s) {
     }
 }
 
-static void draw_paddle(int center_row, int col, int height) {
+static void draw_paddle(int center_row, int col, int height, char glyph) {
     int half = height / 2;
     for (int dr = -half; dr <= half; ++dr) {
         int r = center_row + dr;
         if (r >= 0 && r < SCREEN_HEIGHT) {
-            screen[r][col] = 'I';
+            screen[r][col] = glyph;
         }
     }
 }
@@ -42,7 +42,7 @@ void game_pong_run(void) {
     // Court: expand play area by using edge columns
     const int left_col = 0;
     const int right_col = SCREEN_WIDTH - 1;
-    const int paddle_height = 3; // smaller paddles to open space
+    const int paddle_height = 5; // slightly bigger paddles for easier play
 
     int p1_center_row = SCREEN_HEIGHT / 2;
     int p2_center_row = SCREEN_HEIGHT / 2;
@@ -168,13 +168,13 @@ void game_pong_run(void) {
         screen[0][2] = (char)('0' + (score_p1 % 10));
         screen[0][SCREEN_WIDTH - 3] = (char)('0' + (score_p2 % 10));
 
-        // Paddles
-        draw_paddle(p1_center_row, left_col, paddle_height);
-        draw_paddle(p2_center_row, right_col, paddle_height);
+        // Paddles (colored using Snake font mapping: 'b' body green, 'B' body blue)
+        draw_paddle(p1_center_row, left_col, paddle_height, 'b');
+        draw_paddle(p2_center_row, right_col, paddle_height, 'B');
 
-        // Ball as 'O'
+        // Ball: use 'a' to render as red apple from Snake font
         if (ball_row >= 0 && ball_row < SCREEN_HEIGHT && ball_col >= 0 && ball_col < SCREEN_WIDTH) {
-            screen[ball_row][ball_col] = 'O';
+            screen[ball_row][ball_col] = 'a';
         }
 
         write_on_screen((const char (*)[SCREEN_WIDTH])screen);
