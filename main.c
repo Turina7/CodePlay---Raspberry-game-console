@@ -59,11 +59,16 @@ void main() {
     while (1) {
             // Modo interativo
             if (g_key_pressed) {
-                if (g_last_key >= '1' && g_last_key <= '9') {
+                // tecla de menu
+                if (g_last_key == 'm' || g_last_key == 'M') {
+                    write_on_screen(choose_game);
+                } else if (g_last_key >= '1' && g_last_key <= '9') {
                     int selection = (int)(g_last_key - '1');
                     if (selection >= 0 && selection < (int)g_games_count) {
                         if (g_games[selection].run) {
                             g_games[selection].run();
+                            // voltar ao menu após encerrar o jogo
+                            write_on_screen(choose_game);
                         } else {
                             write_on_screen(g_games[selection].screen);
                         }
