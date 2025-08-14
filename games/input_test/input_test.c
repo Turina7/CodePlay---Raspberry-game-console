@@ -37,7 +37,6 @@ void game_input_test_run(void) {
             else if (k == 's') { if (r1 < SCREEN_HEIGHT-1) r1++; }
             else if (k == 'a') { if (c1 > 0) c1--; }
             else if (k == 'd') { if (c1 < SCREEN_WIDTH-1) c1++; }
-            else if (k == 'm') { running = 0; break; }
         }
         if (g_key_pressed_p2) {
             char k = g_last_key_p2; // already mapped w/a/s/d from arrows
@@ -47,6 +46,7 @@ void game_input_test_run(void) {
             else if (k == 'a') { if (c2 > 0) c2--; }
             else if (k == 'd') { if (c2 < SCREEN_WIDTH-1) c2++; }
         }
+        if (g_last_key == 'm' || g_last_key == 'M') { running = 0; break; }
         clear_screen();
         draw_string(0, 0, "INPUT TEST   M=MENU");
         draw_string(1, 0, "P1: WASD");
