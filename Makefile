@@ -15,13 +15,14 @@ CFLAGS = -mcpu=cortex-a7 -mfloat-abi=softfp -nostdlib -nostartfiles -ffreestandi
 # Flags do assembler
 ASFLAGS = -mcpu=cortex-a7
 
-INCLUDES = -I$(USPIHOME)/include -I$(USPIHOME)/env/include
+INCLUDES = -I. -I$(USPIHOME)/include -I$(USPIHOME)/env/include
 CFLAGS += $(INCLUDES)
 
 CPPFLAGS = $(INCLUDES)
 
 # Arquivos fonte
-SOURCES_C = main.c video.c utils.c teclado.c 
+GAMES_SOURCES = $(wildcard games/*/*.c)
+SOURCES_C = main.c video.c utils.c teclado.c games_manifest.c $(GAMES_SOURCES)
 
 # Arquivos objeto
 OBJECTS = $(USPIHOME)/env/lib/startup.o $(SOURCES_C:.c=.o)
@@ -34,6 +35,12 @@ KERNEL_IMG = kernel.img
 
 # Regra padrão
 all: $(KERNEL_IMG)
+
+# Auto-generate games_manifest.c from games/*/game.txt and games/*/screen.txt
+games_manifest.c: FORCE
+	@tools/gen_games_manifest.sh
+
+FORCE:
 
 # Compilar arquivos C
 %.o: %.c

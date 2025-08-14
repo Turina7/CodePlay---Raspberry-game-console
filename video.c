@@ -626,7 +626,7 @@ void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_
 // RENDERIZAÇÃO DE TEXTO
 // =============================================================================
 
-void write_on_screen(char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
+void write_on_screen(const char text_matrix[SCREEN_HEIGHT][SCREEN_WIDTH])
 {
     static uint32_t text_pixel_matrix[MATRIX_HEIGHT][MATRIX_WIDTH];
 
