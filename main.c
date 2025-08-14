@@ -8,14 +8,30 @@ void main() {
     // Delay para estabilizar o sistema
     for (volatile int i = 0; i < 1000000; i++);
 
+        char credit_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {
+        "                ",
+        "  Writen and    ",
+        "    Directed by ",
+        "                ",
+        "   G. Turina    ",
+        "   T. Marinho   ",
+        "   L. Papoti    ",
+        "                ",
+        "                "
+    };
+    write_on_screen(credit_screen);
+    for (volatile int i = 0; i < 100000000; i++);
+
     char start_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-        "          ",
-        "          ",
-        "          ",
-        " CODEPLAY ",
-        "          ",
-        "          ",
-        "          "
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "    CODEPLAY    ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
     };
     write_on_screen(start_screen);
     for (volatile int i = 0; i < 100000000; i++);
@@ -23,19 +39,22 @@ void main() {
     for(int i = 0; i < SCREEN_HEIGHT; i++){
         for(int j = 0; j < SCREEN_WIDTH; j++){
             start_screen[i][j] = 'X';
+            start_screen[SCREEN_HEIGHT - i - 1][SCREEN_WIDTH - j - 1] = 'X';
             write_on_screen(start_screen);
             for (volatile int i = 0; i < 1000000; i++);
         }
     }
 
     char choose_game[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-        "pick game",
-        " 1  Snake",
-        " 2 Tetris",
-        " 3  Pong ",
-        " 4  Empty",
-        " 5  Empty",
-        " 6  Empty"
+        " Choose a game: ",
+        " 1  Snake      ",
+        " 2  Tetris     ",
+        " 3  Pong       ",
+        " 4  Empty      ",
+        " 5  Empty      ",
+        " 6  Empty      ",
+        " 7  Empty      ",
+        " 8  Empty      "
     };
     write_on_screen(choose_game);
     for (volatile int i = 0; i < 100000; i++);
@@ -47,24 +66,24 @@ void main() {
 
                 if (g_last_key == '1'){
                     char snake_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-                        " SNAKE GAME",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           "
+                        " SNAKE GAME    ",
+                        "               ",
+                        "               ",
+                        "               ",
+                        "               ",
+                        "               ",
+                        "               "
                     };
                     write_on_screen(snake_screen);
                 } else if (g_last_key == '2') {
                     char tetris_screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-                        "TETRIS GAME",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           ",
-                        "           "
+                        "TETRIS GAME    ",
+                        "               ",
+                        "               ",
+                        "               ",
+                        "               ",
+                        "               ",
+                        "               "
                     };
                     write_on_screen(tetris_screen);
                 } else if (g_last_key == '3') {

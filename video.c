@@ -590,27 +590,32 @@ int init_framebuffer()
 
 void fill_screen_from_matrix(uint32_t *matrix, int original_width, int original_height)
 {
-    if (fb_msg.fb_addr == 0)
+    if (fb_msg.fb_addr == 0 || original_width <= 0 || original_height <= 0)
     {
         return;
     }
 
+    // Pega as dimensões da tela a partir da configuração do framebuffer.
+    // fb_msg.pitch é o número de bytes por linha, então dividimos por 4 (32 bits/pixel) para obter a largura em pixels.
     int screen_width = fb_msg.pitch / 4;
     int screen_height = fb_msg.virt_height;
 
-    // Removida verificação rígida de divisibilidade para permitir escalamento
-
-    int fator_linha = screen_height / original_height;
-    int fator_coluna = screen_width / original_width;
+    // Obtém o ponteiro para o framebuffer.
+    // O endereço de memória do framebuffer retornado pelo mailbox tem bits extras que precisam ser removidos.
     uint32_t *framebuffer = (uint32_t *)(uintptr_t)(fb_msg.fb_addr & 0x3FFFFFFF);
 
+    // Itera sobre cada pixel da TELA FÍSICA.
     for (int screen_y = 0; screen_y < screen_height; screen_y++)
     {
         for (int screen_x = 0; screen_x < screen_width; screen_x++)
         {
-            int original_y = screen_y / fator_linha;
-            int original_x = screen_x / fator_coluna;
-            // Acesso usando aritmética de ponteiros para simular array 2D
+            // Calcula o pixel correspondente na MATRIZ ORIGINAL usando proporção.
+            // Esta é a correção principal: evita a divisão de inteiros prematura.
+            int original_y = screen_y * original_height / screen_height;
+            int original_x = screen_x * original_width / screen_width;
+
+            // Pinta o pixel da tela com a cor do pixel da matriz original.
+            // Acesso à matriz original (que é 1D na memória) a partir de coordenadas 2D.
             framebuffer[screen_y * screen_width + screen_x] =
                 matrix[original_y * original_width + original_x];
         }
