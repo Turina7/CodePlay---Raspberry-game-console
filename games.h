@@ -18,5 +18,6 @@ extern const size_t g_games_count;
 // Weak declarations so manifest can reference symbols from games/* without explicit headers
 __attribute__((weak)) void game_snake_run(void);
 __attribute__((weak)) void game_input_test_run(void);
+__attribute__((weak)) void game_pong_run(void);
 
 #endif
