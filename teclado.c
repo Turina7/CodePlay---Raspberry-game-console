@@ -7,36 +7,6 @@
 
 static const char FromSample[] = "sample";
 
-char texto[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-    "          ",
-    " BEM VINDO",
-    "  AO LAB  ",
-    " DE BRUNO ",
-    "  Basseto ",
-    "          ",
-    "          "
-};
-
-char texto2[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-    "          ",
-    "          ",
-    "          ",
-    " CODEPLAY ",
-    "          ",
-    "          ",
-    "          "
-};
-
-char texto3[SCREEN_HEIGHT][SCREEN_WIDTH] = {
-    "          ",
-    "          ",
-    "   BRUNO  ",
-    "   PUSSY  ",
-    "          ",
-    "          ",
-    "          "
-};
-
 int g_key_pressed = 0;
 char g_last_key = 0;
 int g_key_pressed_p1 = 0;
@@ -70,27 +40,6 @@ static void KeyPressedHandler(const char *pString)
         // Compat: manter flags antigas para o menu existente
         g_last_key = c;
         g_key_pressed = 1;
-    }
-}
-
-void handle_keyboard_input(char key) {
-    // Normaliza maiúsculas para minúsculas
-    if (key >= 'A' && key <= 'Z') {
-        key = key + 32;
-    }
-    
-    switch (key) {
-        case '1':
-            write_on_screen(texto);
-            break;
-        case '2':
-            write_on_screen(texto2);
-            break;
-        case '3':
-            write_on_screen(texto3);
-            break;
-        default:
-            break;
     }
 }
 
