@@ -282,9 +282,7 @@ void game_pong_run(void) {
                     // Add a bit of vertical change based on hit position
                     if (next_row < p1_center_row) ball_dr = -1;
                     else if (next_row > p1_center_row) ball_dr = 1;
-                    // Proportional speed-up on paddle hit (~20%)
-                    int new_threshold = (tick_threshold * 4) / 5; if (new_threshold < 1) new_threshold = 1; tick_threshold = new_threshold;
-                    int new_delay = (frame_delay_ticks * 4) / 5; if (new_delay < 20000) new_delay = 20000; frame_delay_ticks = new_delay;
+                    // Remove speed adjustments per request: keep constant during rally
                 }
             }
 
@@ -296,9 +294,7 @@ void game_pong_run(void) {
                     ball_dc = -ball_dc;
                     if (next_row < p2_center_row) ball_dr = -1;
                     else if (next_row > p2_center_row) ball_dr = 1;
-                    // Proportional speed-up on paddle hit (~20%)
-                    int new_threshold = (tick_threshold * 4) / 5; if (new_threshold < 1) new_threshold = 1; tick_threshold = new_threshold;
-                    int new_delay = (frame_delay_ticks * 4) / 5; if (new_delay < 20000) new_delay = 20000; frame_delay_ticks = new_delay;
+                    // Remove speed adjustments per request: keep constant during rally
                 }
             }
 
@@ -310,7 +306,7 @@ void game_pong_run(void) {
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p2 % 2 == 0) ? -1 : 1;
                 ball_dc = -1; // serve to left player next
-                // Reset difficulty at each score
+                // Keep base speed (no dynamic adjustments)
                 tick_threshold = initial_tick_threshold;
                 frame_delay_ticks = initial_frame_delay_ticks;
                 updates_since_serve = 0;
@@ -335,7 +331,7 @@ void game_pong_run(void) {
                 ball_col = SCREEN_WIDTH / 2;
                 ball_dr = (score_p1 % 2 == 0) ? -1 : 1;
                 ball_dc = 1; // serve to right player next
-                // Reset difficulty at each score
+                // Keep base speed (no dynamic adjustments)
                 tick_threshold = initial_tick_threshold;
                 frame_delay_ticks = initial_frame_delay_ticks;
                 updates_since_serve = 0;
